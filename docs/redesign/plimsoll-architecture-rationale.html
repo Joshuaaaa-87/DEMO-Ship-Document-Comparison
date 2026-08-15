@@ -1,0 +1,388 @@
+<meta charset="utf-8">
+<title>Plimsoll 架構論述彙編</title>
+<style>
+  :root{
+    --bg:#f6f6f7; --page:#ffffff; --ink:#161616; --sub:#5b5b5b; --line:#e5e5e8; --soft:#f4f4f5; --code:#f3f3f5;
+    --accent:#171717; --link:#2f6db0;
+    --hi-t:#b3241b; --hi-b:#fbf2f1; --md-t:#8e540c; --md-b:#faf6ee; --lo-t:#14603f; --lo-b:#f1f7f3;
+    --ok:#1f7a44; --ok-b:#e9f5ee; --warn:#8a5a12; --warn-b:#faf3e3; --info:#1e6f8c; --info-b:#e9f5f8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0e0e0e;--page:#171717;--ink:#ededed;--sub:#a6a6a6;--line:#2b2b2b;--soft:#1f1f1f;--code:#1d1d1f;
+      --accent:#ededed;--link:#7db3e8;--hi-b:#2a1918;--md-b:#251e12;--lo-b:#152420;--ok-b:#0f2a1c;--warn-b:#241f0e;--info-b:#0f272e;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter","Noto Sans TC",system-ui,sans-serif;line-height:1.6;font-size:14px}
+  .wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:232px 1fr;gap:0}
+  nav{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:22px 16px 40px;border-right:1px solid var(--line)}
+  nav .brand{font-weight:800;font-size:13px;margin-bottom:2px}
+  nav .bsub{font-size:11px;color:var(--sub);margin-bottom:14px}
+  nav a{display:block;color:var(--sub);text-decoration:none;font-size:12px;padding:3px 8px;border-radius:6px;line-height:1.35}
+  nav a:hover{background:var(--soft);color:var(--ink)}
+  nav a .n{font-family:ui-monospace,monospace;color:var(--link);font-weight:700;margin-right:5px}
+  main{background:var(--page);padding:30px 42px 60px;border-left:1px solid var(--line);min-width:0}
+  header.doc h1{font-size:25px;margin:0 0 4px}
+  header.doc .lead{color:var(--sub);font-size:13px;margin-bottom:6px}
+  header.doc .meta{font-size:11px;color:var(--sub);font-family:ui-monospace,monospace}
+  h2{font-size:19px;margin:34px 0 8px;padding-top:14px;border-top:2px solid var(--line);scroll-margin-top:14px}
+  h2 .sn{font-family:ui-monospace,monospace;color:var(--link);font-size:15px;margin-right:8px}
+  h3{font-size:14.5px;margin:18px 0 6px}
+  p{margin:0 0 9px}
+  .lead2{color:var(--sub)}
+  ul,ol{margin:4px 0 10px;padding-left:20px}
+  li{margin-bottom:4px}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,monospace;font-size:.9em}
+  p code,li code,td code{background:var(--code);padding:1px 5px;border-radius:5px}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;padding:12px 14px;overflow-x:auto;font-size:12px;line-height:1.5}
+  table{border-collapse:collapse;width:100%;margin:8px 0 12px;font-size:12.5px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  th{background:var(--soft);font-weight:700}
+  .call{border-radius:9px;padding:11px 14px;margin:12px 0;border-left:4px solid var(--accent);background:var(--soft);font-size:13px}
+  .call.ok{border-color:var(--ok);background:var(--ok-b)}
+  .call.warn{border-color:var(--warn);background:var(--warn-b)}
+  .call.info{border-color:var(--info);background:var(--info-b)}
+  .call .k{font-weight:800;display:block;margin-bottom:3px}
+  .pill{font-size:10.5px;font-weight:800;padding:1px 7px;border-radius:999px;white-space:nowrap}
+  .p-hi{background:var(--hi-b);color:var(--hi-t)} .p-md{background:var(--md-b);color:var(--md-t)} .p-lo{background:var(--lo-b);color:var(--lo-t)}
+  .foot{margin-top:40px;border-top:1px solid var(--line);padding-top:12px;font-size:11px;color:var(--sub)}
+  @media (max-width:820px){ .wrap{grid-template-columns:1fr} nav{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)} main{border-left:none;padding:24px} }
+  @media print{ nav{display:none} .wrap{grid-template-columns:1fr} main{border:none} body{background:#fff} }
+</style>
+
+<div class="wrap">
+<nav>
+  <div class="brand">Plimsoll 架構論述彙編</div>
+  <div class="bsub">Design Rationale Reference</div>
+  <a href="#p0"><span class="n">0</span>核心原則</a>
+  <a href="#p1"><span class="n">1</span>現況體檢</a>
+  <a href="#p2"><span class="n">2</span>儲存架構</a>
+  <a href="#p3"><span class="n">3</span>稽核骨幹</a>
+  <a href="#p4"><span class="n">4</span>核准角色＋可調規則</a>
+  <a href="#p5"><span class="n">5</span>雙頁碼＋data_origin</a>
+  <a href="#p6"><span class="n">6</span>Bedrock＋分析模式</a>
+  <a href="#p7"><span class="n">7</span>異動判斷：偵測管線</a>
+  <a href="#p8"><span class="n">8</span>規模與效能</a>
+  <a href="#p9"><span class="n">9</span>省 token／提正確率</a>
+  <a href="#p10"><span class="n">10</span>設計模式</a>
+  <a href="#p11"><span class="n">11</span>RAG 具體規格</a>
+  <a href="#p12"><span class="n">12</span>特徵層＋稽核即標籤</a>
+  <a href="#p13"><span class="n">13</span>知識庫（第二主線）</a>
+  <a href="#p14"><span class="n">14</span>影響視圖 2D／3D</a>
+  <a href="#p15"><span class="n">15</span>成本分層</a>
+  <a href="#p16"><span class="n">16</span>測試策略</a>
+  <a href="#p17"><span class="n">17</span>靈魂質問（誠實評估）</a>
+  <a href="#p18"><span class="n">18</span>決策速查 §19–32</a>
+  <a href="#p19"><span class="n">19</span>AC 對照</a>
+</nav>
+
+<main>
+<header class="doc">
+  <h1>Plimsoll 架構論述彙編</h1>
+  <div class="lead">稽核骨幹 × 儲存範圍 × 核准角色 × 比對管線 × 成本——整段設計對話的完整論述，依主題重整。</div>
+  <div class="meta">2026-08-16 · 分支 claude/plimsoll-architecture-decisions · 對應 architecture-decisions-A-B.md §19–32、ui-spec §9/§3.4 · 本輪只寫規格未動程式</div>
+</header>
+
+<section id="p0">
+<h2><span class="sn">0</span>核心原則（貫穿全案）</h2>
+<div class="call ok"><span class="k">一句話</span>確定性層決定「哪裡變／變什麼類型」（免 token、可稽核）；LLM 只做「語意解讀」；<b>規則引擎＋人工擁有最終判定</b>。LLM 永不是必要相依，也<b>永不設定最終風險級</b>。</div>
+<p>這條原則同時滿足四個需求：#2 稽核可重現、#7 輕量可轉向、#8 不亂下因果斷言、以及成本可控。現行反面基線恰好違反它——把「分級」和「解讀」都丟給 LLM 逐筆呼叫。</p>
+</section>
+
+<section id="p1">
+<h2><span class="sn">1</span>現況體檢（反面基線 tag/1.1.0）</h2>
+<p class="lead2">讀 <code>src/comparison.py</code>、<code>backend/main.py</code>、<code>src/ai_providers.py</code> 後，對照需求 v3 最高優先四條，全部踩線：</p>
+<table>
+<tr><th>需求</th><th>現況</th><th>判定</th></tr>
+<tr><td>#2 稽核軌跡不可覆寫遺失</td><td><code>Difference.review_status</code> 是單一可變字串，無覆核人/時戳，AI 初判被人工判定直接覆蓋</td><td><span class="pill p-hi">覆核一次即蓋掉初判</span></td></tr>
+<tr><td>#3 雙頁碼一級欄位</td><td><code>Source.page</code> 只有 PDF 頁 index，印刷頁碼不存在</td><td><span class="pill p-hi">顯示層無從拼湊</span></td></tr>
+<tr><td>#4 分級門檻可設定</td><td><code>_risk_and_reason()</code> if-ladder 寫死，詞庫是模組常數</td><td><span class="pill p-hi">改門檻＝改程式</span></td></tr>
+<tr><td>#6 假資料三態</td><td><code>/api/vision-diff</code>、<code>/api/slides-mindmap</code> fallback 回未標記寫死值</td><td><span class="pill p-hi">Demo 誤導風險</span></td></tr>
+</table>
+<p>規模：Python ~1,395 LOC、前端 ~1,409 LOC（將棄），目錄深度 3，真正引擎僅 ~730 LOC。<b>買到的是可跑 demo，不是可擴充地基。</b></p>
+</section>
+
+<section id="p2">
+<h2><span class="sn">2</span>儲存架構：local-first ＋ 檔案化 ＋ DB 可選上游</h2>
+<p>經三輪演進定案：不架 DB、純檔案，且「沒 DB 存本地、有 DB 就灌入」。</p>
+<h3>三種本機格式的選型</h3>
+<table>
+<tr><th>選項</th><th>對 append-only 稽核</th><th>判定</th></tr>
+<tr><td>Google Sheet</td><td>需 OAuth＋雲端，等於提前引入 Drive（#5）；離線失效</td><td>v1 不採；留 P5 上游</td></tr>
+<tr><td>Excel .xlsx</td><td>假 append：整檔重寫、開檔即鎖、崩潰全毀</td><td>只當匯出視圖</td></tr>
+<tr><td><b>txt / JSONL</b></td><td>真 append（O_APPEND）、零相依、可 grep/diff、離線最穩</td><td><b>真相來源</b></td></tr>
+</table>
+<div class="call info"><span class="k">關鍵洞見</span>因為稽核採 append-only、事件不可變、每筆帶唯一 <code>event_id</code>，<b>同步到 DB 就變成「idempotent 往前補」的免衝突動作</b>——事件日誌本身就是同步協定。</div>
+<pre>Layer 1 LocalStore（永遠在，離線可用，真相來源）
+  review_events.jsonl (append-only ★) · session.json · differences.json · config/*.json
+Layer 2 SyncTarget（可選、可插拔）
+  Postgres / MySQL / SQLite檔 / 雲端 API   ← DB 是下游鏡像，非第二真相來源
+Gateway
+  append_event(): ①先寫 LocalStore＝commit點  ②SyncTarget 健康則 best-effort 寫穿
+  flush_pending(): 讀未同步事件 → idempotent upsert</pre>
+<p>三態 tag（<code>本機</code>／<code>未同步</code>／<code>已同步</code>）由可覆寫的 <code>sync_state.json</code> sidecar 推導，<b>絕不回改稽核日誌</b>。DB 連線一律延遲背景探測、<b>不影響啟動</b>、失敗降級本機（§24）。</p>
+</section>
+
+<section id="p3">
+<h2><span class="sn">3</span>稽核骨幹：append-only 事件模型（event-sourcing 精簡版）</h2>
+<div class="call"><span class="k">結構性保證</span>差異的覆核狀態<b>不是欄位，是投影</b>。改判＝追加一則凌駕事件，舊事件連同其 AI 初判、覆核人、時戳原封保留。「不可被覆寫遺失」不是靠紀律，是靠 schema 讓覆寫在物理上不可能。</div>
+<pre>{"event_id":"e-0002","difference_id":"D01","event_type":"HUMAN_REVIEW",
+ "ai_risk_at_time":"High","ruleset_version":"v1","human_verdict":"CONFIRMED",
+ "reviewer_name":"陳○○","approval_role_code":"TECH_SUPT",
+ "approval_role_label_snapshot":"安全品質主管（Technical Superintendent）",
+ "created_at":"2026-08-15T03:35:12Z","prev_event_id":"e-0001"}</pre>
+<h3>防竄改：凍結前綴 hash 錨點（採用你的提案）</h3>
+<ul>
+<li>格式/規則先寫死，讀檔即 <code>validate_schema()</code>，手改破壞結構當場被抓。</li>
+<li>只 hash 已凍結前綴 <code>[0, offset)</code>——相容 append-only 的合法成長；改到前綴＝竄改。</li>
+<li>錨點存<b>別處</b>（DB 優先，離線退本機 <code>.integrity/</code>）；灌 DB 前比對，不一致＝<b>告警＋略過該 session＋隔離待人工</b>，本機日誌照原樣保留（它本身是證據）。</li>
+</ul>
+<p>事件寫入單寫入者序列化（<code>asyncio.Lock</code> + <code>flush</code> + <code>fsync</code>）。骨幹必落 <b>P0</b>——不可事後補，補的那一刻早期事件已遺失。</p>
+</section>
+
+<section id="p4">
+<h2><span class="sn">4</span>核准角色 ＋ 可調分級規則</h2>
+<ul>
+<li><b>覆核人拆兩欄</b>：<code>reviewer_name</code>（自由文字）＋ <code>approval_role_code</code>（結構化）。</li>
+<li><b>角色用參考表非 enum</b>：<code>config/approval_roles.json</code>，種子 <code>DPA / TECH_SUPT / FLEET_MGR / OTHER</code>，企業體系不同時增列免改程式；<code>OTHER</code> 另存 <code>custom_role_label</code>。</li>
+<li><b>門檻用版本化規則檔</b>：<code>config/rulesets/v{N}.json</code>，調門檻＝新增版本檔（immutable），比對凍結 <code>ruleset_version</code>，讓「這筆 AI 初判是哪版規則產生」永遠可回溯。倉庫 JSON 只當出廠種子。</li>
+<li><b>核准權限</b>：<code>config/approval_policies</code>（角色 × 可核准最高風險級）。</li>
+<li>覆核與簽核經事件關聯此二者，並存 <code>approval_role_label_snapshot</code> 快照——表改名不影響歷史稽核。</li>
+</ul>
+<p>這一組取代寫死的 <code>_risk_and_reason()</code>；每條規則 <code>when → then</code> 是一個 Specification，命中即記可解釋來源（滿足 AC3）。</p>
+</section>
+
+<section id="p5">
+<h2><span class="sn">5</span>雙頁碼 ＋ data_origin 三態（一級欄位）</h2>
+<ul>
+<li>頁碼參照＝<code>{pdf_page, print_label, label_source}</code>；<code>print_label</code> 取自 PDF PageLabels，<b>可為非數字</b>（羅馬頁碼），抓不到則 <code>NULL</code> 且 <code>label_source=unknown</code>，<b>不猜測</b>。</li>
+<li>所有 API 回傳帶 <code>data_origin ∈ {computed, ai_inferred, demo_seed}</code>；前端見 <code>demo_seed</code> 掛「示範資料」tag，真實 session 禁未標記寫死值。</li>
+</ul>
+</section>
+
+<section id="p6">
+<h2><span class="sn">6</span>Bedrock 協作 ＋ 分析模式 A/B/C（可切換）</h2>
+<p>「換模型會不會影響」取決於走哪條路線——因為影響的本質是「分級與判定由確定性程式產生，還是由模型產生」。</p>
+<table>
+<tr><th></th><th>A · rules-first（預設）</th><th>C · model-heavy</th><th>B · model-only</th></tr>
+<tr><td>誰定風險級</td><td>規則引擎（確定性）</td><td>模型</td><td>模型</td></tr>
+<tr><td>換模型影響</td><td><b>極小</b>：grades 可重現</td><td>中大：grades 漂移</td><td><b>最大</b>：換模型＝換一套差異分級</td></tr>
+<tr><td>稽核（#2）</td><td>可重現</td><td>需釘版本＋快照</td><td>跨模型不可重現，治理風險</td></tr>
+<tr><td>成本</td><td>最低</td><td>高</td><td>最高</td></tr>
+</table>
+<div class="call ok"><span class="k">拍板</span>不三選一，把界線做成 config knob <code>analysis_mode</code>，<b>預設 A</b>。整套介面化（<code>LlmProvider</code> Strategy＋Rules Engine），三模式同一套程式切設定即換。</div>
+<ul>
+<li><b>雙雲皆在範圍，Bedrock 先接、Vertex(Gemini) 次之</b>（另留 OpenAI／local-rules）。每筆判定記 <code>model_id</code>＋版本＋<code>provider</code>＋<code>analysis_mode</code>。</li>
+<li><b>路由而非全送</b>：只有「規則分不清」或「大改但無規則觸發」才送 LLM；批次 10–20 筆／請求。</li>
+<li>擷取/分類用<b>低溫 0.0–0.2</b>（現行 0.5 偏高易漂）；prompt 強制 abstention（證據不足回 <code>needs_human=true</code>，不杜撰）。</li>
+<li>現行 <code>ai_providers.py</code> 逐筆呼叫 LLM（25 筆＝25 次 round-trip）是要改的核心。</li>
+</ul>
+</section>
+
+<section id="p7">
+<h2><span class="sn">7</span>異動判斷：偵測管線 Stage 0–4</h2>
+<pre>Stage -1 頁面分類 → 掃描頁: OSS OCR(低信心才上雲) / 圖頁: 像素diff+實體抽取(+vision殘差)
+Stage 0  正規化   NFKC + 全半形統一 + 去頁首頁尾頁碼 + CJK 斷詞
+Stage 1  結構對齊 以章節碼/SFI/DMC/條號對齊條文；頁雜湊短路先跳過未變頁
+Stage 2  確定性分類 數值/義務/安全詞/引用/適用範圍（規則可設定，命中即記可解釋來源）
+Stage 3  LLM 語意 只處理「大改但無規則觸發」「規則分不清」→ 隱含/語意變更
+Stage 4  人工覆核 最終判定，寫 append-only 事件</pre>
+<table>
+<tr><th>變動類型</th><th>怎麼抓</th><th>層級</th></tr>
+<tr><td>數值/極限（85→80°C）</td><td>數值+單位正規化後比對，最便宜最可靠</td><td>確定性</td></tr>
+<tr><td>內規/程序義務（每月→每週）</td><td>義務詞＋頻率詞集合</td><td>確定性</td></tr>
+<tr><td>法規引用</td><td>引用/條號/料號（CP-120、DMC）regex</td><td>確定性</td></tr>
+<tr><td>適用範圍</td><td>scope 語句偵測</td><td>確定性</td></tr>
+<tr><td>隱含邏輯／語意改變</td><td>「大改但無規則觸發」路由 → Bedrock 解讀</td><td>LLM</td></tr>
+</table>
+<div class="call warn"><span class="k">OCR 路由子規則（圖片式文字貼在 PDF）</span>
+<b>圖片是文字</b>→OCR（OSS 先、低信心才上雲）；<b>圖片是圖</b>→像素 diff＋實體抽取，殘差才 vision；<b>整份丟模型只當「OCR 失敗/純圖」的逐頁升級</b>，非預設，輸出標信心、低信心導人工（AC4）。</div>
+<p>低信心（對齊差、掃描歪斜、OCR 缺字、LLM abstain）→ 標「無法可信比對」導人工，<b>不輸出未受支持結論</b>（AC4）。</p>
+<div class="call warn"><span class="k">現行正確性 bug</span><code>SequenceMatcher</code> 以空白切 token，但中文沒有空白——CJK 條文會誤判。Stage 0 的 CJK 斷詞是必修，不是優化。</div>
+</section>
+
+<section id="p8">
+<h2><span class="sn">8</span>規模與效能</h2>
+<table>
+<tr><th>維度</th><th>舒適區</th><th>上限訊號</th></tr>
+<tr><td>同時比對</td><td>一次一對（單人單機）</td><td>多人 → 破壞單寫入者 → P5 DB-primary</td></tr>
+<tr><td>每份頁數</td><td>數百頁（秒級）</td><td>上千頁 → 背景工作＋進度</td></tr>
+<tr><td>檔案容量</td><td>限制在文字密度非 MB；5MB/800 頁 OK</td><td>50MB 純掃描 → 需 OCR</td></tr>
+<tr><td>差異數量</td><td>數百筆</td><td>全送 LLM → 分鐘級＋$$；靠批次+路由壓下</td></tr>
+</table>
+<p>瓶頸排序：<b>LLM 呼叫數 ＞ diff 演算法 ＞ PDF 抽字 ＞ JSONL</b>。上千頁 I/O 四招（按 CP 值）：</p>
+<ol>
+<li><b>頁雜湊短路</b>（最大槓桿）：兩版同 hash 的頁整頁跳過，1000 頁只改 12 頁就只處理 12 頁。</li>
+<li><b>PyMuPDF(fitz)</b> 取代 pypdf（C-backed、快數倍，§6 光柵化也需要）。<span class="pill p-md">AGPL：demo/鐵人賽非閉源商用可接受，商用化再購授權</span></li>
+<li>長工作<b>背景任務＋進度回報</b>（單人單機用 asyncio/thread，不引入 Celery/Redis）。</li>
+<li>以章節切塊<b>分段平行</b>（<code>ProcessPoolExecutor</code> 繞 GIL）。</li>
+</ol>
+</section>
+
+<section id="p9">
+<h2><span class="sn">9</span>省 token／提正確率的小工具</h2>
+<h3>省 token（由大到小）</h3>
+<ol>
+<li><b>規則優先路由</b>——多數變更本機判定，只殘差送 LLM。</li>
+<li>只送變更片段＋最小上下文，不送整頁。</li>
+<li>批次 10–20 筆／請求。</li>
+<li><b>內容雜湊快取</b>：<code>sha256(old|new|ruleset_version|model_id)</code> 命中重用，重跑 0 token。</li>
+<li>正規化擋掉假 diff（去頁首頁尾、collapse 空白、忽略純重新分頁）。</li>
+<li><b>純數值變更捷徑</b>：只有數字變 → 規則直接輸出，根本不進 LLM。</li>
+</ol>
+<h3>提正確率（幾乎不耗 token）</h3>
+<ol>
+<li>依章節碼/條號<b>結構對齊</b>（最大槓桿，解決重新分頁假差異）。</li>
+<li>NFKC＋全半形統一＋<b>CJK 斷詞</b>（修中文 bug）。</li>
+<li>數值+單位正規化（<code>85 °C</code>/<code>85℃</code> 視為同一）。</li>
+<li>表格列以主鍵欄對齊。</li>
+<li>對齊分數門檻低 → 標低信心導人工。</li>
+<li>（選配、本機無 token）小型多語 embedding 對齊改寫/搬位的同一條文。</li>
+</ol>
+</section>
+
+<section id="p10">
+<h2><span class="sn">10</span>設計模式</h2>
+<table>
+<tr><th>模式</th><th>用在哪</th></tr>
+<tr><td>Event Sourcing</td><td>append-only <code>review_events</code>，現況＝fold</td></tr>
+<tr><td>CQRS-lite</td><td>寫路徑（append）與讀路徑（投影）分離</td></tr>
+<tr><td>Strategy</td><td><code>LlmProvider</code>／<code>EmbeddingProvider</code>／排序策略／檢視模式</td></tr>
+<tr><td>Adapter</td><td><code>SyncTarget</code>（SQLite/PG/MySQL）、匯出器、各家 SDK</td></tr>
+<tr><td>Repository</td><td><code>StorageGateway</code> 隔開「檔案 now / DB later」</td></tr>
+<tr><td>Pipeline + Chain of Responsibility</td><td>偵測管線；規則 first-match-wins</td></tr>
+<tr><td>Rules Engine / Specification</td><td><code>rulesets/v{N}.json</code>，可設定可版本化</td></tr>
+<tr><td>Provenance snapshot（Memento 精神）</td><td><code>ruleset_version</code>／角色標籤／<code>model_id</code> 凍結</td></tr>
+</table>
+</section>
+
+<section id="p11">
+<h2><span class="sn">11</span>RAG 具體規格</h2>
+<pre>介面（皆可插拔）
+  EmbeddingProvider.embed(texts)         # 預設本機 intfloat/multilingual-e5-small(384維,CPU,離線)
+  RagIndex.build(chunks) / load()        # 檔案化，寫 rag_index.jsonl
+  Retriever.search(query, k=6)           # 向量 cosine + 關鍵字 + 已覆核diff加權
+
+chunk（重用 Stage1 條文單元，非固定 token）
+  {chunk_id, doc_side, pdf_page, print_label, clause_id, difference_id, text, vector}
+
+語料白名單（硬規則）
+  ✓ 本 session 的 old/new 文件、extract_pages 頁文字、differences.json
+  ✗ 外部船級社規範（DNV/LR/ABS）一律不進索引（#5）
+
+fallback: 無 embedding/離線 → 關鍵字檢索(retrieve_context，免 token)
+雲端 embedding: Bedrock 先接、Vertex 次之
+儲存: data/store/sessions/&lt;id&gt;/rag_index.jsonl   ← 無 DB（與 §19 一致）</pre>
+<p>回答必附 <code>D01 · 新 p.4</code> 引用＋免責聲明；語料小（單 session 數百~數千 chunk），flat cosine 足夠，暫不需 FAISS 索引結構。</p>
+</section>
+
+<section id="p12">
+<h2><span class="sn">12</span>特徵層 ＋ 稽核即標籤</h2>
+<table>
+<tr><th>特徵群</th><th>例子</th></tr>
+<tr><td>數值</td><td><code>has_number</code>、<code>number_delta</code>、<code>unit</code>、方向、<code>is_threshold</code></td></tr>
+<tr><td>義務/程序</td><td><code>obligation_added/removed</code>、<code>frequency_shortened</code>、禁止詞</td></tr>
+<tr><td>引用/實體</td><td><code>citation_changed</code>、<code>part_number_changed</code>、<code>applicability_changed</code></td></tr>
+<tr><td>結構</td><td><code>edit_distance</code>、<code>pct_changed</code>、<code>is_table_row</code>、<code>alignment_confidence</code></td></tr>
+<tr><td><b>語意（殺手級）</b></td><td><b><code>embedding_distance(old,new)</code></b>——重用 e5-small、免 LLM token</td></tr>
+</table>
+<div class="call info"><span class="k">飛輪</span>殺手級特徵：<code>embedding_distance</code> 高 ＋ 無規則觸發 ＝ 送 LLM 的路由依據。而<b>每筆人工判定（含誤報/風險改判）就是對特徵向量的標籤</b>——跨 session 累積成 labeled data，日後訓小分類器（logistic/GBDT）降誤報、<b>免 token 推論</b>。競品拿不走你的海事覆核標註。v1 只做規則＋特徵，學習模型為後續（守 #7）。</div>
+</section>
+
+<section id="p13">
+<h2><span class="sn">13</span>知識庫（第二主線）</h2>
+<p>獨立於 per-session RAG（§30）與稽核日誌（§21）之外的<b>跨 session 累積知識</b>。</p>
+<ul>
+<li><b>來源白名單</b>：已覆核差異＋判定、<code>component_taxonomy</code>(SFI)、<code>rulesets</code>、術語表（料號/閥號/縮寫）、常見變更樣式。<b>硬禁船級社規範文字（#5）</b>。</li>
+<li><b>用途</b>：以判例輔助路由/分級、「你以前看過類似變更」提示、餵 §31 分類器。</li>
+<li><b>儲存</b>：<code>data/store/kb/*.jsonl</code>，不架 DB。</li>
+<li><b>四者分工</b>：RAG＝當前文件檢索、KB＝跨案累積、Audit＝標籤來源、Features＝表示法。</li>
+</ul>
+</section>
+
+<section id="p14">
+<h2><span class="sn">14</span>影響視圖：component_ref（SFI）＋ 2D，3D 延後</h2>
+<ul>
+<li><b>橋樑＝資料掛鉤</b>：<code>affected</code> 升級成結構化 <code>component_ref</code>，對 <code>config/component_taxonomy.json</code>。</li>
+<li><b>編碼骨幹採 SFI Group System</b>（船舶業標準）而非自創——等同航空 ATA／汽車 PLM-BOM 的零件編號骨幹；船廠 3D（AVEVA/CADMATIC）多已帶 SFI/KKS 標記。</li>
+<li><b>v1 出貨 2D 系統示意</b>（SVG）：點差異→高亮落點組件（PoC 已驗證）。<b>3D 不納入 v1、之後再做。</b></li>
+</ul>
+<div class="call info"><span class="k">車商/航空怎麼做 3D（你要的參考）</span>他們靠的是<b>「編號骨幹」不是網格</b>：航空用 S1000D SNS／ATA＋IETP 把程序連到圖；汽車用 PLM BOM 料號→減面 CAD 匯出。<b>先要碼、再要模型</b>——3D 貴在逐船 bespoke CAD／零件切分／ID 對映（資料授權問題，非渲染）。同一 <code>component_ref</code> 現餵 2D、日後餵 3D，核心不重工。</div>
+</section>
+
+<section id="p15">
+<h2><span class="sn">15</span>成本分層與衝突登記</h2>
+<div class="call ok"><span class="k">通則</span>預設走「便宜且可稽核」（A 模式＋OSS OCR＋頁雜湊短路），<b>只對殘差/低信心/已變更的部分升級到雲端</b>，並全程快取。</div>
+<table>
+<tr><th>項目</th><th>與成本的衝突</th><th>處置</th></tr>
+<tr><td>B/C 雲端重</td><td>token 隨頁數×差異×重跑成長</td><td>預設 A；B/C 可切換按部署開</td></tr>
+<tr><td>雲端 OCR/vision</td><td>$$／頁 × 上千頁</td><td>OSS 先跑、只殘差上雲、快取</td></tr>
+<tr><td>PyMuPDF</td><td>AGPL（demo/鐵人賽可接受）</td><td>採用；閉源商用再購授權/換庫</td></tr>
+<tr><td>AWS＋GCP 雙雲</td><td>工量/測試面翻倍</td><td>確認雙雲；Strategy/Adapter 吸收</td></tr>
+<tr><td>3D 資產</td><td>逐船 CAD 授權/製作</td><td>v1 只做 2D＋掛鉤，3D 延後</td></tr>
+</table>
+</section>
+
+<section id="p16">
+<h2><span class="sn">16</span>測試策略</h2>
+<p class="lead2">現況：規格樹<b>零測試</b>；舊 Playwright 針對被棄用的 React UI，等於作廢。稽核是核心賣點，其不變式<b>必須自動化、且落在 P0</b>。</p>
+<ul>
+<li><b>P0 pytest</b>：規則引擎（text pair→預期風險）、數值/義務偵測、結構對齊、防竄改（改凍結行→前綴 hash 不符→quarantine）。</li>
+<li><b>稽核不變式（P0–P3）</b>：append-only 永不 mutate；投影＝最後人工判定；<code>AI_INITIAL</code> 先於 <code>HUMAN_REVIEW</code>；同步 idempotent。用測試把 #2 釘死。</li>
+<li><b>Golden 快照</b>：拿 <code>data/demo/*.pdf</code>，純規則引擎（不呼叫 LLM）跑固定差異集擋回歸。</li>
+<li><b>LLM 層</b>：CI mock Bedrock，測 prompt/JSON/abstention/路由；絕不打真 API。</li>
+<li><b>E2E Playwright（新 UI，綁 AC）</b>：AC1 上傳、AC2 展開雙欄、情境四未覆核 High 攔截、<b>持久化 journey（判定→重整→還在）</b>、<b>啟動獨立（無 DB 全流程可用）</b>。全跑規則引擎確保 deterministic。</li>
+</ul>
+</section>
+
+<section id="p17">
+<h2><span class="sn">17</span>靈魂質問：這專案解決到使用者問題嗎（誠實評估）</h2>
+<p><b>它真正解決的</b>：頁碼可追溯的差異 ＋ 防竄改的人工覆核稽核軌跡（強、難仿）、分級可設定、不足就 abstain。</p>
+<p><b>四個誠實缺口</b>（規格 #7 已自認急迫性未驗證）：</p>
+<ol>
+<li>「比對版本」是不是急迫的痛？未驗證。更深的痛可能是「沒人知道出了新版／哪份是現行版」——diff 預設使用者已有兩版且願意比。</li>
+<li>文件現實：<b>大量掃描/圖片</b>，文字比對前提最脆弱（沒硬 OCR 就 garbage in）。</li>
+<li>安全信任門檻：漏抓一個關鍵變更是災難級；人在迴路很誠實，但那是<b>輔助</b>不是取代。</li>
+<li>導入摩擦：不綁 DMS（對可轉向對）＝手動餵 PDF，對忙碌工程師是採用殺手。</li>
+</ol>
+<div class="call"><span class="k">判斷</span>架構是穩的，且<b>刻意輕、可轉向——這正是「問題未驗證」該有的對沖</b>。但架構替代不了客戶探索。最高 ROI 一步：問 2–3 個真實對象「今天怎麼比版本？哪裡卡？願不願貼 PDF？稽核軌跡對稽核/DPA/船級社值不值得付錢？」</div>
+<div class="call info"><span class="k">定位（#7）</span>稽核／簽核軌跡<b>不作為單一主打，而是與差異偵測、100% 可追溯、可設定規則、輕量可轉向並列的「優點之一」</b>。不背 BPMN 工作流引擎與 PKI 電簽的包袱——<b>hash 錨定的 append-only 簽核事件即實務簽名</b>（對內部 MoC 達電簽約 80% 價值）。</div>
+</section>
+
+<section id="p18">
+<h2><span class="sn">18</span>決策速查 §19–32</h2>
+<table>
+<tr><th>#</th><th>決定</th></tr>
+<tr><td>19</td><td>P0–P4 儲存：local-first、檔案化無 DB、append-only JSONL 真相來源、DB 可選上游</td></tr>
+<tr><td>20</td><td>核准角色參考表＋版本化 rulesets＋approval_policies，取代寫死 <code>_risk_and_reason()</code></td></tr>
+<tr><td>21</td><td>append-only 事件模型＋凍結前綴 hash 防竄改，兼任同步協定，骨幹落 P0</td></tr>
+<tr><td>22</td><td>雙頁碼 <code>{pdf_page,print_label,label_source}</code> ＋ <code>data_origin</code> 三態</td></tr>
+<tr><td>23</td><td>SyncTarget 契約（可插拔上游，DB 為下游鏡像）</td></tr>
+<tr><td>24</td><td>DB 不影響啟動＋UI 明示連線狀態（設定→資料來源）</td></tr>
+<tr><td>25</td><td>分析模式 A/B/C 可切換（預設 A）＋雙雲 Bedrock 先接</td></tr>
+<tr><td>26</td><td>掃描/圖片 OCR 管線（OSS 優先分層＋圖文/圖路由子規則）</td></tr>
+<tr><td>27</td><td>大文件效能：頁雜湊短路＋PyMuPDF＋背景＋分段平行</td></tr>
+<tr><td>28</td><td>component_ref（SFI 骨幹）＋2D 影響視圖；3D 不納入 v1</td></tr>
+<tr><td>29</td><td>成本分層：便宜可稽核為預設，殘差才升級雲端，全程快取</td></tr>
+<tr><td>30</td><td>RAG 預留位置：語料 #5-safe、e5-small 預設、檔案化</td></tr>
+<tr><td>31</td><td>特徵層＋稽核即標籤（<code>embedding_distance</code>＋標籤飛輪）</td></tr>
+<tr><td>32</td><td>知識庫（第二主線，跨 session、#5-safe、檔案化）</td></tr>
+</table>
+</section>
+
+<section id="p19">
+<h2><span class="sn">19</span>AC 對照</h2>
+<table>
+<tr><th>AC</th><th>要求</th><th>本設計對應</th></tr>
+<tr><td>AC1</td><td>載入兩份文件顯示名稱/版本/日期/設備，缺失警示</td><td>右欄 FileCard＋中欄 doc-info＋MissingVersionField</td></tr>
+<tr><td>AC2</td><td>≥5 列差異，含雙版本、頁碼、原文</td><td>DiffCard 雙欄 diff＋雙頁碼（§22）＋右欄原文</td></tr>
+<tr><td>AC3</td><td>安全數值/程序變更→候選重大提示＋受影響設備＋建議</td><td>規則命中即記可解釋來源（§20）＋component_ref（§28）</td></tr>
+<tr><td>AC4</td><td>資訊不足/低信心→標記未知引導人工，不輸出未受支持結論</td><td>abstention＋低信心導人工（§7 管線）＋掃描頁「無法可信比對」</td></tr>
+<tr><td>情境四</td><td>未覆核 High 匯出二次確認</td><td>UnreviewedExportGuard 讀投影（§21）＋簽核事件</td></tr>
+</table>
+</section>
+
+<div class="foot">
+  完整規格：<code>docs/redesign/architecture-decisions-A-B.md</code>（§19–32）與 <code>ui-spec.md §9 / §3.4</code>。架構圖：<code>plimsoll-architecture-diagram.html</code>。逐輪對話：<code>plimsoll-design-conversation.html</code>（本檔未取代它）。本輪只寫規格，未動程式；分支 <code>claude/plimsoll-architecture-decisions</code>，<code>main</code> 未動。
+</div>
+</main>
+</div>
