@@ -138,7 +138,7 @@ def test_playwright_browser_ui():
             print("  ✓ React SPA loaded successfully.")
 
             # Verify NotebookLM differentiator card in Product Advantage tab
-            page.get_by_role("button", name="產品優勢與定位").click()
+            page.get_by_role("button", name="NotebookLM 差異定位").click()
             time.sleep(1)
             page.wait_for_selector("text=為何選擇本 AI 船舶差異 Agent，而非 NotebookLM？", timeout=10000)
             print("  ✓ NotebookLM Differentiator component rendered.")
