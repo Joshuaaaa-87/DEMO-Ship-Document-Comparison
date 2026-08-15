@@ -6,6 +6,15 @@
 
 ---
 
+## v1 前提（已與需求方確認，2026-08-15）
+
+- **使用情境：單人單機**（單一覆核人、單一機器）。JSONL 單寫入者足夠，v1 不需 DB→local pull。
+- **真相來源：本機永遠為主**，DB 永遠是下游鏡像；同步**單向 push（local→DB）**，不做 pull。
+- **本輪交付：只更新規格**（ui-spec §9 #19–24、§3.4 ④），不動程式。決策落 `claude/plimsoll-architecture-decisions-…` 分支，**不 push、不碰 `main`／`codex/260815`**。
+- **仍待決（不阻擋本輪）**：PDF 原檔在本機的暫存與清理策略（僅 P3「原始 PDF」模式才需要）；JSONL 每行的 `prev_hash`/`prev_event_id` 在單人單機＋前綴錨點下屬冗餘，可留作 belt-and-suspenders 或日後精簡。
+
+---
+
 ## 核心觀念：事件日誌＝同步協定
 
 因為稽核軌跡採 **append-only、事件不可變、每筆帶唯一 `event_id`**（§21），同步到任何上游只是：
