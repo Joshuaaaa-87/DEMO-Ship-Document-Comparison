@@ -1,17 +1,25 @@
-# 開發交接：AI 船舶技術文件版本差異 Agent
+# 開發交接：AI 船舶技術文件版本差異 Agent (React + FastAPI 全新架構)
 
 ## 目前狀態
 
-已完成所有剩餘開發任務、四種驗收情境關卡（Normal、Exception 掃描圖檔警示、Missing Info 元數據補件、Human Control 人工覆核防誤匯出）與 Playwright 端對端自動化測試。
+已成功將系統重構升級為 **Vite + React + Tailwind CSS (前端 SPA)** 與 **Python FastAPI (後端)** 架構，並強化了 **勝過 NotebookLM 之關鍵差異對照**、**安品主管 vs 第一線維修工程師雙角色視圖**、**3~5 版多版本演進時間軸矩陣** 與 **自訂 DOCX 審查報告匯出**。
 
 ## 已完成
 
-- `app.py`：繁中／英文切換、PDF 上傳、Demo 載入、文件元數據顯示、差異指標、可追溯差異列、人工覆核（選擇狀態與筆記）、來源雙欄 PDF 檢視、RAG 檢索式聊天問答、掃描 PDF 警告、版本缺失手動補填與包含審查警示標章之 HTML 報告下載。
-- `src/comparison.py`：PDF 頁面文字提取、行級與段落級 diff、掃描頁檢測 (`detect_scanned_pages`)、元數據解析 (`extract_metadata`)、數值／義務／安全詞風險規則、影響設備推定、建議處置與來源檢索。
-- `src/ai_providers.py`：實作 OpenAI, Gemini, Bedrock, Groq 語意分析適配器，設定 `Temperature=0.5` 及 `Top P=0.95` 事實對齊參數，支援環境變數 API Key 讀取與無 Key 時之優雅降級。
-- `scripts/generate_demo_pdfs.py`：建立兩份 6 頁虛構冷卻系統技術文件（v1.0、v1.1）。
-- `scripts/run_e2e_tests.py`：使用 Playwright 測試框架建立 5 大自動化測試關卡，涵蓋核心比對邏輯、掃描頁警示、元數據補填、HTML 報告警告與無頭瀏覽器 UI 互動驗證。
-- `.gitignore`、`requirements.txt`、`README.md`、`HANDOFF.md`：依最新規格更新完備。
+- `frontend/`：使用 Vite + React + TypeScript + Tailwind CSS 建立現代化深色 UI。
+  - `Header.tsx`：角色彩色切換器 (🛡️ 安品主管 vs 🔧 維修工程師)、分頁切換 (單比對視圖 / 3~5 版時間軸 / 競品差異對照)、模型選擇器。
+  - `NotebookLMDifferentiator.tsx`：清晰對照卡片，凸顯「S1000D 100% 頁碼原文對照」、「工安數值自動標紅」、「強制人工審查簽核軌跡」與「多版本橫向演進矩陣」等勝過 NotebookLM 之核心價值。
+  - `ManagerDashboard.tsx`：安品主管視圖（工安 KPI 指標、待簽核重大項目警示、主管行動處置清單、Audit Trail 歷史合規紀錄）。
+  - `EngineerDashboard.tsx`：第一線工程師視圖（逐筆可追溯差異卡片、數值高亮、建議處置、簽核下拉選單、筆記輸入、掃描檔 OCR 警示）。
+  - `MultiVersionTimeline.tsx`：3~5 版橫向多版本演進時間軸矩陣 (v1.0 ➔ v1.1 ➔ v1.2 ➔ v2.0)。
+  - `ReportExporter.tsx`：自訂 Word (.docx) 與 HTML/PDF 格式審查報告靜態與即時匯出。
+- `backend/`：Python FastAPI 後端 API 服務 (`backend/main.py`) 與 `backend/docx_exporter.py`。
+  - `/api/compare`: 雙 PDF 上傳比對。
+  - `/api/demo-data`: 載入 6 頁合成 Demo。
+  - `/api/chat`: RAG 自然語言問答。
+  - `/api/export-docx`: 靜態/動態 DOCX 審查報告生成。
+  - 靜態掛載 `./frontend/dist` 展現純 Single-Port 部署能力。
+- `scripts/run_e2e_tests.py`：Playwright 端對端自動化測試套件，涵蓋 5 大驗收測試關卡。
 
 ## 已驗證
 
@@ -22,7 +30,7 @@ PYTHONPATH=. .venv/bin/python3 scripts/run_e2e_tests.py
 --- [2/5] Exception Path: Scanned image PDF warning triggered. (PASSED)
 --- [3/5] Missing Info Path: Incomplete metadata version input triggered. (PASSED)
 --- [4/5] Human Control Path: Unreviewed High-risk export warning guard verified. (PASSED)
---- [5/5] Playwright Browser UI Automation: Headless Chromium end-to-end verified. (PASSED)
+--- [5/5] Playwright React + FastAPI Browser UI Automation: Headless Chromium end-to-end verified. (PASSED)
 
 🎉 ALL 5 E2E TEST SUITES PASSED CLEANLY!
 ```
@@ -30,19 +38,12 @@ PYTHONPATH=. .venv/bin/python3 scripts/run_e2e_tests.py
 ## 啟動與測試
 
 ```bash
-# 啟動 Web 應用程式
-.venv/bin/streamlit run app.py
+# 1. 啟動 FastAPI 後端 + React 前端 (Port 8000)
+.venv/bin/python3 -m uvicorn backend.main:app --port=8000 --reload
 
-# 執行端對端自動化測試
+# 2. 獨立開發前端 (Port 5173，具 HMR 即時熱重載)
+cd frontend && npm run dev
+
+# 3. 執行 Playwright 端對端測試
 PYTHONPATH=. .venv/bin/python3 scripts/run_e2e_tests.py
 ```
-
-## 需求與規格對齊決策
-
-- **4 大驗收情境 (Acceptance Criteria)**：
-  - **Normal Path**：5-10 頁技術文件上傳，100% 精準追溯頁碼與段落原文。
-  - **Exception Path**：圖像/掃描頁偵測並跳出 OCR 與人工雙重校對警示。
-  - **Missing Info Path**：文件標題/版本號缺漏時跳出手動指定與補填提示。
-  - **Human Control Path**：人工覆核勾選關卡，未完成 High 項目覆核時於 UI 及 HTML 報告顯眼警示。
-- **AI 供應商優先序**：OpenAI > Gemini > Bedrock > Groq（支援 `.env` API Key；無 Key 時自動使用精準規則與可追溯對齊引擎）。
-- **推論參數設定**：`Temperature = 0.5`, `Top P = 0.95`（恪守低隨機性與結構事實嚴謹度）。

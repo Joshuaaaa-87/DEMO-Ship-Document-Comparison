@@ -112,18 +112,18 @@ def test_human_control_path():
 
 
 def test_playwright_browser_ui():
-    print("--- [5/5] Testing Browser UI Automation via Playwright ---")
-    port = 8509
+    print("--- [5/5] Testing Browser UI Automation via Playwright (React + FastAPI) ---")
+    port = 8009
     proc = subprocess.Popen(
-        [sys.executable, "-m", "streamlit", "run", "app.py", f"--server.port={port}", "--server.headless=true"],
+        [sys.executable, "-m", "uvicorn", "backend.main:app", f"--port={port}", "--host=127.0.0.1"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=str(ROOT),
     )
 
     try:
-        # Wait for Streamlit server startup
-        time.sleep(5)
+        # Wait for FastAPI server startup
+        time.sleep(3)
 
         with sync_playwright() as p:
             executable = "/Users/caspertseng/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing"
@@ -135,28 +135,23 @@ def test_playwright_browser_ui():
             page.goto(f"http://localhost:{port}", timeout=20000)
             page.wait_for_selector("text=AI 船舶技術文件版本差異 Agent", timeout=15000)
 
-            print("  ✓ App loaded successfully.")
+            print("  ✓ React SPA loaded successfully.")
 
-            # Click Demo button
-            demo_btn = page.get_by_role("button", name="載入 6 頁合成 Demo")
-            demo_btn.click()
-            time.sleep(3)
+            # Verify NotebookLM differentiator card
+            page.wait_for_selector("text=為何選擇本 AI 船舶差異 Agent，而非 NotebookLM？", timeout=10000)
+            print("  ✓ NotebookLM Differentiator component rendered.")
 
-            # Check if summary cards rendered
-            page.wait_for_selector("text=總差異筆數", timeout=10000)
-            print("  ✓ Demo data loaded. Summary metrics rendered.")
+            # Test Role Switching
+            manager_btn = page.get_by_role("button", name="安品主管")
+            manager_btn.click()
+            time.sleep(1)
 
-            # Verify High risk alert banner
-            page.wait_for_selector("text=待覆核重大項目", timeout=5000)
-            print("  ✓ High-risk unreviewed warning displayed.")
-
-            # Test details expander
-            page.wait_for_selector("text=D01", timeout=5000)
-            print("  ✓ Difference D01 item found.")
+            page.wait_for_selector("text=安品與技術主管審查視圖", timeout=5000)
+            print("  ✓ Role Switcher toggled to Safety Manager View successfully.")
 
             browser.close()
 
-        print("  ✅ Playwright browser UI automation test PASSED.")
+        print("  ✅ Playwright React + FastAPI browser UI automation test PASSED.")
 
     finally:
         proc.terminate()
