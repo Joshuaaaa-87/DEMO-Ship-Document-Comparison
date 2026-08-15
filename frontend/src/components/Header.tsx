@@ -11,8 +11,8 @@ interface HeaderProps {
   onApiKeyChange: (key: string) => void;
   language: string;
   onLanguageChange: (lang: string) => void;
-  activeTab: 'comparison' | 'timeline' | 'differentiator';
-  onTabChange: (tab: 'comparison' | 'timeline' | 'differentiator') => void;
+  activeTab: 'comparison' | 'timeline' | 'slides-mindmap' | 'differentiator';
+  onTabChange: (tab: 'comparison' | 'timeline' | 'slides-mindmap' | 'differentiator') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -61,6 +61,16 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               📊 3~5 版演進時間軸
+            </button>
+            <button
+              onClick={() => onTabChange('slides-mindmap')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeTab === 'slides-mindmap'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/40'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              📽️ Demo 簡報與心智圖
             </button>
             <button
               onClick={() => onTabChange('differentiator')}
