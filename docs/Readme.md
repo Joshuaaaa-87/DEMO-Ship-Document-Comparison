@@ -3,11 +3,6 @@
 
 這是一個以船舶文件比對為主題的研究與概念驗證專案，目標是整理基層船員實際可能使用的比對流程、常見風險，以及相關產品的商業模式。
 
-## 文件
-
-- [船上基層人員的文件比對流程與常見風險](docs/ship-document-comparison-workflow.md)
-- [文件比對公司的傳統與常見獲利模式](docs/document-comparison-business-models.md)
-
 ## 目前涵蓋範圍
 
 - 船上文件版本、有效性與欄位核對；
