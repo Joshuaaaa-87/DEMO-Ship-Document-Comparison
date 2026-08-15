@@ -80,9 +80,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans relative">
       
-      {/* Clean Header Bar */}
+      {/* V1 Light Style Header */}
       <Header
         role={role}
         onRoleChange={setRole}
@@ -92,27 +92,52 @@ export default function App() {
         onTabChange={setActiveTab}
       />
 
-      {/* Main Container with Spacious Spacing */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Simple Action Bar */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
+        {/* Action Controls (Matching V1 Layout) */}
+        <div className="bg-white border border-slate-200 rounded-lg p-4 flex flex-wrap items-center justify-between gap-4 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={loadDemoData}
               disabled={isLoading}
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-semibold transition-all shadow-sm flex items-center gap-2"
+              className="px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded font-bold text-xs transition-all shadow-xs flex items-center gap-2"
             >
               <Play className="w-4 h-4" />
-              {isLoading ? '載入數據中...' : '載入 Demo 比對數據'}
+              {isLoading ? '比對中...' : '載入 6 頁合成 Demo 比對'}
             </button>
-            <span className="text-xs text-slate-400">
-              Demo PDF：<span className="text-slate-300 font-mono">Main_Engine_Cooling_v1.0.pdf</span> vs <span className="text-slate-300 font-mono">v1.1.pdf</span>
+            <span className="text-xs text-slate-500">
+              分析引擎：<strong className="text-teal-700 font-semibold">{provider}</strong>
             </span>
           </div>
 
-          <div className="text-xs text-slate-400">
-            已載入條文差異：<strong className="text-teal-400 font-bold">{differences.length} 筆</strong>
+          <div className="text-xs text-slate-500">
+            提取可追溯差異：<strong className="text-teal-700 font-bold">{differences.length} 筆</strong>
+          </div>
+        </div>
+
+        {/* Document Information Cards (Matching V1 Streamlit Dual Light Cards #f0f7f6) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-teal-50/60 border border-teal-200 rounded-lg p-3.5 text-xs space-y-1 text-slate-800 shadow-xs">
+            <div className="font-bold text-teal-900">
+              <strong>舊版文件：</strong> {oldMeta.title || 'Main Engine Cooling Procedure'}
+            </div>
+            <div className="text-slate-600">
+              <strong>版本號：</strong> <span className="text-teal-700 font-mono font-bold">{oldMeta.version || 'v1.0'}</span> ｜ 
+              <strong> 發布日期：</strong> {oldMeta.date || '2026-08-15'} ｜ 
+              <strong> 總頁數：</strong> 3 頁
+            </div>
+          </div>
+
+          <div className="bg-teal-50/60 border border-teal-200 rounded-lg p-3.5 text-xs space-y-1 text-slate-800 shadow-xs">
+            <div className="font-bold text-teal-900">
+              <strong>新版文件：</strong> {newMeta.title || 'Main Engine Cooling Procedure'}
+            </div>
+            <div className="text-slate-600">
+              <strong>版本號：</strong> <span className="text-teal-700 font-mono font-bold">{newMeta.version || 'v1.1'}</span> ｜ 
+              <strong> 發布日期：</strong> {newMeta.date || '2026-08-15'} ｜ 
+              <strong> 總頁數：</strong> 3 頁
+            </div>
           </div>
         </div>
 
@@ -124,7 +149,7 @@ export default function App() {
         )}
 
         {activeTab === 'comparison' && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {role === 'manager' ? (
               <ManagerDashboard
                 differences={differences}
@@ -154,7 +179,7 @@ export default function App() {
         onProviderChange={setProvider}
       />
 
-      <footer className="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-500 bg-white">
         AI 船舶技術文件版本差異 Agent • S1000D 精準對照與審查簽核
       </footer>
     </div>

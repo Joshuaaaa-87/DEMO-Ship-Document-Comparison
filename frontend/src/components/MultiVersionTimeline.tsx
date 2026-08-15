@@ -47,24 +47,24 @@ export const MultiVersionTimeline: React.FC = () => {
   ];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+    <div className="bg-white border border-slate-200 rounded-lg p-5 space-y-5 shadow-xs">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20">
-            <History className="w-6 h-6" />
+          <div className="p-2 bg-teal-50 text-teal-700 rounded border border-teal-200">
+            <History className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-100">
+            <h2 className="text-base font-bold text-slate-800">
               📊 3~5 版多版本演進時間軸對照矩陣 (Multi-Version Timeline Matrix)
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               橫向縱覽同一程序條文於 v1.0 ➔ v1.1 ➔ v1.2 ➔ v2.0 跨版本之變化演進與風險脈絡
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
-          <GitCommit className="w-4 h-4 text-cyan-400" />
+        <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded border border-slate-200 font-medium">
+          <GitCommit className="w-4 h-4 text-teal-700" />
           <span>4 個版本比較中 (v1.0 ➔ v2.0)</span>
         </div>
       </div>
@@ -73,54 +73,46 @@ export const MultiVersionTimeline: React.FC = () => {
         {timelineData.map((item) => (
           <div
             key={item.section_id}
-            className="bg-slate-800/50 border border-slate-700/80 rounded-xl p-5 hover:border-slate-600 transition-all space-y-4"
+            className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3 shadow-xs"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <span
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                     item.risk === 'High'
-                      ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                      : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                      ? 'bg-rose-100 text-rose-700 border border-rose-200'
+                      : 'bg-amber-100 text-amber-800 border border-amber-200'
                   }`}
                 >
                   {item.risk} Risk
                 </span>
-                <h3 className="text-base font-bold text-slate-200">{item.title}</h3>
+                <h3 className="text-sm font-bold text-slate-800">{item.title}</h3>
               </div>
 
-              <div className="text-xs text-slate-400">
-                影響設備：<span className="text-slate-200 font-semibold">{item.impact_equipment}</span>
+              <div className="text-xs text-slate-500">
+                影響設備：<span className="text-slate-800 font-semibold">{item.impact_equipment}</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2">
-              <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800 relative">
-                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  v1.0 (基線)
-                </div>
-                <div className="text-xs text-slate-300 font-medium">{item.v10}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1 text-xs">
+              <div className="bg-white p-3 rounded border border-slate-200">
+                <div className="text-[10px] font-bold text-slate-500 uppercase mb-1">v1.0 (基線)</div>
+                <div className="text-slate-700 font-medium">{item.v10}</div>
               </div>
 
-              <div className="bg-slate-900/80 p-3 rounded-lg border border-rose-900/50 relative border-l-4 border-l-rose-500">
-                <div className="text-[10px] font-bold text-rose-400 uppercase tracking-wider mb-1">
-                  v1.1 (改版)
-                </div>
-                <div className="text-xs text-rose-200 font-medium">{item.v11}</div>
+              <div className="bg-rose-50/70 p-3 rounded border border-rose-200 border-l-4 border-l-rose-600">
+                <div className="text-[10px] font-bold text-rose-700 uppercase mb-1">v1.1 (改版)</div>
+                <div className="text-rose-900 font-medium">{item.v11}</div>
               </div>
 
-              <div className="bg-slate-900/80 p-3 rounded-lg border border-amber-900/50 relative border-l-4 border-l-amber-500">
-                <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1">
-                  v1.2 (權限)
-                </div>
-                <div className="text-xs text-amber-200 font-medium">{item.v12}</div>
+              <div className="bg-amber-50/70 p-3 rounded border border-amber-200 border-l-4 border-l-amber-600">
+                <div className="text-[10px] font-bold text-amber-800 uppercase mb-1">v1.2 (強化)</div>
+                <div className="text-amber-950 font-medium">{item.v12}</div>
               </div>
 
-              <div className="bg-slate-900/80 p-3 rounded-lg border border-teal-900/50 relative border-l-4 border-l-teal-500">
-                <div className="text-[10px] font-bold text-teal-400 uppercase tracking-wider mb-1">
-                  v2.0 (現行最新)
-                </div>
-                <div className="text-xs text-teal-200 font-medium">{item.v20}</div>
+              <div className="bg-teal-50/70 p-3 rounded border border-teal-200 border-l-4 border-l-teal-600">
+                <div className="text-[10px] font-bold text-teal-800 uppercase mb-1">v2.0 (最新)</div>
+                <div className="text-teal-950 font-medium">{item.v20}</div>
               </div>
             </div>
           </div>
