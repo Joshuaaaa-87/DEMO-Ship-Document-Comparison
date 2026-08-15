@@ -247,3 +247,114 @@ CREATE TABLE approval_policies ( ruleset_version TEXT, approval_role_code TEXT, 
 - 「未連線」時，所有覆核/匯出功能照常運作，資料落本機並標 `未同步`。
 
 > 待確認項：小狀態點的擺放位置（齒輪旁 vs. tag 旁）、是否需要在左欄列頂沿用 `未同步` 提示條。以上不影響後端資料模型，可由 UI/UX 獨立定案。
+
+---
+
+# 進階架構決定（§25–29）：比對管線 · OCR · 效能 · 影響視圖 · 成本
+
+> 討論並確認於 2026-08-15。本輪仍**只寫規格、不動程式**；決策落 `claude/plimsoll-architecture-decisions-…` 分支。
+> 貫穿原則：**確定性層決定「哪裡變/變什麼類型」（免 token、可稽核）；LLM 只做語意解讀；規則引擎＋人工擁有最終判定。LLM 永不是必要相依，也永不設定最終風險級。**
+
+| # | 決定 |
+|---|---|
+| 25 | **分析模式可切換，預設 A（rules-first hybrid）**：`analysis_mode ∈ {rules_first(A), model_heavy(C), model_only(B)}` 為 config knob，同一套程式切設定即換，預設 **A**（成本最低、grades 可重現、稽核最穩）。`LlmProvider` 為 Strategy，**雙雲皆在範圍，AWS Bedrock 先接、GCP Vertex(Gemini) 次之**（另留 OpenAI/local-rules）。每筆 AI 判定寫入稽核事件時記 `model_id`＋版本＋`provider`＋`analysis_mode`。**治理註記**：B/C 之下換模型或雲端模型自升版會使「同文件的 AI 初判」漂移，故 B/C 必須釘版本＋逐筆快照；A 無此問題。 |
+| 26 | **掃描/圖片 OCR 管線（Stage -1，OSS 優先分層）**：頁面先分類（文字層 OK／掃描頁／工程圖頁）。掃描頁走 OCR，**OSS 優先**（Tesseract／PaddleOCR，繁中優先 PaddleOCR）先跑、**只有低信心或已變更頁才升級雲端**（AWS Textract／GCP Document AI，兩家皆接）。工程圖頁走像素 diff 定位＋只把變更區塊送 vision（§6），並優先**抽取結構化實體（閥號/料號/流量值/標註）比對實體集合（確定性）**，模糊區才 vision-LLM。OCR 文字一律標 `data_origin` 與信心分數；低信心→標「無法可信比對」導人工（AC4），不把 OCR 猜測當定論。頁圖雜湊快取，同頁不 OCR 兩次。 |
+| 27 | **大文件效能（上千頁）**：(a) **頁雜湊短路**——兩版同 hash 的頁整頁跳過，只深處理變更頁（最大槓桿）；(b) 文字擷取**採 PyMuPDF(fitz)** 取代 pypdf（C-backed、快數倍，且 §6 光柵化本就需要）——**授權註記：PyMuPDF 為 AGPL（含 network-use 條款）；本專案為 demo／鐵人賽、非閉源商用且願開源，AGPL 可接受；日後閉源商用化再購商業授權或換庫**（此為工程判斷非法律意見）；(c) 長工作走**背景任務＋進度回報**（單人單機用 asyncio/thread，不引入 Celery/Redis）；(d) 以章節切塊**分段平行**（`ProcessPoolExecutor` 繞 GIL）。 |
+| 28 | **`component_ref` 影響掛鉤 → 2D 影響視圖（v1）／3D 延後**：現行自由文字 `affected` 升級為結構化 `component_ref`，對一份 `config/component_taxonomy.json`（船舶系統/組件受控字彙，做法同 rulesets/approval_roles）；**編碼骨幹採船舶業標準 SFI Group System（等同航空 ATA／汽車 PLM-BOM 的零件編號骨幹），而非自創——船廠 3D（AVEVA/CADMATIC）多已帶 SFI/KKS 標記，日後對映自然**。**v1 範圍＝`component_ref` 資料掛鉤＋2D 系統示意（SVG）影響視圖**：點差異→高亮落點組件（PoC 已驗證）。**3D 不納入 v1（之後再做）**，待「具體客戶＋CAD 存取＋預算」才啟動——3D 貴在逐船 bespoke CAD／零件切分與 ID 對映（資料/授權問題，非渲染問題）。**同一 `component_ref` 現餵 2D、日後餵 3D，核心不重工。** |
+| 29 | **成本分層策略**：預設走「便宜且可稽核」（A 模式＋OSS OCR＋頁雜湊短路），**只對殘差/低信心/已變更的部分升級到雲端（LLM/OCR/vision）**，並全程快取（內容雜湊、頁圖雜湊、OCR 結果，鍵含 `model_id`+`ruleset_version`）。AWS＋GCP 雙雲的工量翻倍由 Strategy/Adapter 吸收。凡系統設下限（top-N、抽樣、不重試）須 `log()` 揭露，不靜默截斷。 |
+| 30 | **RAG 架構預留位置（可插拔，語料限本機自有文件）**：預留 `RagIndex`／`Retriever`／`EmbeddingProvider` 三介面，供 Composer 問答（F8）與差異引用（`D01 · 新 p.4`）使用。**語料白名單嚴格限：本次 session 的舊/新文件、`extract_pages` 頁文字、`differences.json`**；`config` 硬性**禁止外部船級社規範（DNV/LR/ABS）進索引**（#5）。向量儲存**維持檔案化**（本機 `rag_index.jsonl` 存 chunk+向量，語料小用 flat cosine 即可，FAISS-Flat 選配），不架 DB，與 §19 一致。`EmbeddingProvider ∈ {local-e5-small(預設,本機CPU,免API), bedrock, vertex}`——**預設本機小模型 `intfloat/multilingual-e5-small`（384 維、繁中+英混排、CPU 快、離線可跑）**；雲端 embedding **Bedrock 先接、Vertex 次之**。無 embedding/離線時**退回關鍵字檢索**（現行 `retrieve_context`，免 token）。每個檢索片段帶來源（文件/頁碼），回答必附引用＋免責聲明（沿用 `local_chat_answer`，呼應 #8）。 |
+
+> **定位註記（#7）**：稽核／簽核軌跡**不作為單一主打**，而是**與差異偵測、100% 可追溯、可設定分級規則、輕量可轉向並列的「優點之一」**。行銷與 demo 敘事平衡呈現，不獨押稽核；亦不背 BPMN 工作流引擎與 PKI 電簽的包袱（hash 錨定的 append-only 簽核事件即實務簽名）。
+
+## §25 補充：analysis_mode 與 provider
+
+```
+config/app.json
+{
+  "analysis_mode": "rules_first",           // rules_first(A,預設) | model_heavy(C) | model_only(B)
+  "llm_provider":  "bedrock",               // bedrock | vertex | openai | none(local rules)
+  "llm_model":     "anthropic.claude-3-5-sonnet-...",  // 記入每筆稽核事件
+  "temperature":   0.1                       // 擷取/分類用低溫；敘事摘要另設
+}
+```
+- `LlmProvider` 介面：`analyze(diffs) / interpret(spans) / vision(crops)`；adapter：`BedrockProvider`、`VertexProvider`、`OpenAIProvider`、`LocalRulesProvider`。
+- 稽核事件新增欄位：`model_id`、`model_version`、`provider`、`analysis_mode`（凍結於判定當下）。
+
+## §26 補充：偵測管線（含 OCR）全貌
+
+```
+Stage -1 頁面分類 → 掃描頁: OSS OCR(低信心才上雲) / 圖頁: 像素diff+實體抽取(+vision殘差)
+Stage 0  正規化   NFKC + 全半形統一 + 去頁首頁尾頁碼 + CJK 斷詞
+Stage 1  結構對齊 以章節碼/DMC/條號對齊條文；頁雜湊短路先跳過未變頁
+Stage 2  確定性分類 數值/義務/安全詞/引用/適用範圍（規則可設定，命中即記可解釋來源）
+Stage 3  LLM 語意 只處理「大改但無規則觸發」「規則分不清」→ 隱含/語意變更
+Stage 4  人工覆核 最終判定，寫 append-only 事件
+```
+
+**OCR 路由子規則（回應「圖片式文字貼在 PDF」）**
+- **「圖片是文字」**（掃描段落、貼圖文字，無文字層）→ 走 **OCR**：OSS（Tesseract/PaddleOCR）先跑，**只有低信心或已變更頁才升級雲端**（Textract/Document AI）。**不整份丟 vision-LLM。**
+- **「圖片是圖」**（工程水路/電路圖）→ **像素 diff 定位 ＋ 實體抽取**（閥號/料號/流量值），殘差才送 vision-LLM。
+- **整份丟模型（Variant B / full-AI）只當「OCR 失敗或純圖」的逐頁升級**，非預設；輸出一律標 `data_origin`＋信心，低信心→人工（AC4），不把 OCR/vision 猜測當定論。
+- **頁面分類器判準**：文字層字元密度、影像覆蓋率、是否偵測到向量線條/圖元 → `text` / `scanned_text` / `diagram`，決定走哪條路由。
+
+## §28 補充：component_ref 與 taxonomy
+
+```json
+// config/component_taxonomy.json（受控字彙；2D/3D 共用節點鍵）
+[
+  { "ref": "cooling.sensor.outlet_temp", "label_zh": "出口溫度感測", "system": "cooling", "node2d": "c-sensor", "node3d": "TS_outlet" },
+  { "ref": "cooling.pump.P-101",          "label_zh": "循環泵浦 P-101", "system": "cooling", "node2d": "c-pump",   "node3d": "PUMP_P101" },
+  { "ref": "cooling.cooler.HX-1",         "label_zh": "冷卻器 HX-1",    "system": "cooling", "node2d": "c-cooler", "node3d": "HX_1" }
+]
+```
+- `differences.json` 每筆新增 `component_ref`（由規則/LLM 產生，標 `data_origin`）。
+- 2D 視圖是純前端消費者：`component_ref → node2d → 高亮`；3D 版改讀 `node3d`，資料不變。
+
+## 成本衝突登記（§29 對應，需持續與需求方校準）
+
+| 項目 | 衝突 | 現行處置 |
+|---|---|---|
+| B/C 雲端重 | token 隨頁數×差異×重跑成長 | 預設 A；B/C 可切換、按部署開 |
+| 雲端 OCR/vision | $$／頁 × 上千頁 | OSS 先跑、只殘差上雲、快取 |
+| PyMuPDF | AGPL（demo/鐵人賽非閉源商用 → 可接受） | **採用**；日後閉源商用再購授權/換庫 |
+| AWS＋GCP 雙雲 | 工量/測試面翻倍 | **確認雙雲**（鐵人賽要實際使用）；Strategy/Adapter 吸收 |
+| 3D 資產 | 逐船 CAD 授權/製作 | v1 只做 2D＋掛鉤，3D 延後 |
+
+## §30 補充：RAG 具體規格
+
+**三個介面（Strategy/Repository，皆可插拔）**
+```python
+class EmbeddingProvider:      # local-e5-small(預設) | bedrock | vertex
+    def embed(texts: list[str]) -> list[list[float]]: ...
+class RagIndex:               # 檔案化，無 DB
+    def build(chunks: list[Chunk]) -> None            # 寫 rag_index.jsonl
+    def load() -> None
+class Retriever:
+    def search(query: str, k: int = 6) -> list[Chunk] # 向量 cosine + 關鍵字混合
+```
+
+**chunk 策略（重用 Stage 1 條文單元，非固定 token）**
+```json
+// rag_index.jsonl 一行一 chunk
+{ "chunk_id":"c-001", "doc_side":"new", "pdf_page":4, "print_label":"4",
+  "clause_id":"3.2.1", "difference_id":"D01",
+  "text":"冷卻水出口溫度不得高於 80 °C", "vector":[0.01,-0.04, ...] }
+```
+
+**語料白名單（硬規則，違者不進索引）**
+```
+✓ 本 session 的 old/new 文件、extract_pages 頁文字、differences.json
+✗ 外部船級社規範（DNV/LR/ABS）——未經書面同意一律排除（#5）
+```
+
+**pipeline**
+```
+chunk(條文) → EmbeddingProvider.embed(預設本機 e5-small) → rag_index.jsonl(flat)
+  → Retriever.search(cosine top-k + 關鍵字 + 已覆核diff加權) → LlmProvider 回答
+  → 附 D01·新 p.4 引用 + 免責聲明（沿用 local_chat_answer，#8）
+fallback: 無 embedding/離線 → 純關鍵字檢索(retrieve_context，免 token)
+provider 順序: 本機 e5-small 預設；雲端 embedding Bedrock 先接、Vertex 次之
+儲存: data/store/sessions/<id>/rag_index.jsonl  ← 與 §19 一致，無 DB
+```
+
+> 現行 `retrieve_context()`（關鍵字評分）即 RAG 的 fallback retriever；embedding 版是升級、非取代，離線仍可用。語料小（單 session 數百~數千 chunk），flat cosine 足夠，暫不需 FAISS 索引結構。

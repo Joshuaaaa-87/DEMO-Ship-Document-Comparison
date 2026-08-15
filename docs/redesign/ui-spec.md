@@ -479,3 +479,11 @@ PDF 頁 ──光柵化(PyMuPDF, 300dpi)──> PNG
 | 22 | **雙頁碼與 `data_origin` 為一級資料欄位**：頁碼＝`{pdf_page, print_label, label_source}`，印刷頁碼取自 PDF PageLabels，抓不到則 `NULL` 且不猜測；所有 API 回傳帶 `data_origin ∈ {computed, ai_inferred, demo_seed}`，真實 session 禁未標記寫死值（呼應假資料三態鐵則） |
 | 23 | **SyncTarget 契約（可插拔上游）**：LocalStore 為 commit 點、DB 為 best-effort／延後 flush 之下游；三態 tag（`本機`／`未同步`／`已同步`）由 `sync_state.json` 推導；參考 adapter 採 SQLAlchemy Core，同一份程式以連線字串接 SQLite 檔／Postgres／MySQL，不綁定 DB 品牌 |
 | 24 | **DB 不影響啟動＋UI 明示連線狀態**：啟動路徑只讀本機、零 DB 呼叫；DB 連線一律延遲背景探測、失敗降級本機、永不阻塞或崩潰。設定 → 資料來源新增「資料庫同步」狀態區並保留全域小狀態點（見 §3.4 ④） |
+| 25 | **分析模式可切換（預設 A）**：`analysis_mode` A(rules-first)/B/C 為 config knob；`LlmProvider` Strategy，雙雲 **Bedrock 先接、Vertex 次之**；每筆 AI 判定記 `model_id`＋版本＋mode。詳見 [`architecture-decisions-A-B.md`](./architecture-decisions-A-B.md) §25 |
+| 26 | **掃描/圖片 OCR 管線（OSS 優先分層）**：**圖片是文字→OCR**（OSS 先、低信心才上雲 Textract/DocAI）；**圖片是圖→像素 diff＋vision**；不整份丟 AI；OCR 標信心、低信心導人工（AC4） |
+| 27 | **大文件效能**：頁雜湊短路（跳過未變頁）＋PyMuPDF（AGPL，demo/鐵人賽可接受）＋背景工作＋分段平行 |
+| 28 | **影響視圖**：`affected`→結構化 `component_ref`（**SFI Group System 骨幹**）；v1 出貨 **2D 系統示意**，**3D 不納入 v1、之後再做**；同一 ref 日後餵 3D |
+| 29 | **成本分層**：便宜可稽核為預設，只殘差/低信心才升級雲端（LLM/OCR/vision），全程快取；雙雲工量由 Adapter 吸收 |
+| 30 | **RAG 預留位置**：語料限本機自有文件（**禁 DNV/LR/ABS 進索引**，#5）；embedding 預設本機 `e5-small`、可切雙雲（Bedrock 先接）；向量檔案化不架 DB；無 embedding 退回關鍵字檢索 |
+| 31 | **特徵層＋稽核即標籤**：每筆差異存特徵向量（含殺手級 `embedding_distance`）；人工判定＝標籤，跨 session 累積，日後訓小分類器降誤報、免 token 推論 |
+| 32 | **知識庫（第二主線）**：跨 session 累積知識（已覆核判例／術語／變更樣式），語料 #5-safe、檔案化不架 DB；與 RAG（當前文件）／Audit（標籤）分工 |

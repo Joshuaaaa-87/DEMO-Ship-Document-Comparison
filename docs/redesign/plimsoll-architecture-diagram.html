@@ -1,0 +1,155 @@
+<meta charset="utf-8">
+<title>Plimsoll 目標架構圖</title>
+<style>
+  :root{
+    --bg:#ffffff; --ink:#141414; --sub:#5a5a5a; --line:#e4e4e7; --chip:#ffffff;
+    --ingest:#2f6db0; --ingest-bg:#eaf2fb; --pipe:#1f7a44; --pipe-bg:#eaf7f0;
+    --prov:#6b46c1; --prov-bg:#f3eefb; --data:#b5761a; --data-bg:#fbf3e8;
+    --know:#1e7d8c; --know-bg:#eaf6f8; --sync:#555b66; --sync-bg:#f1f2f4;
+    --ui:#b03a52; --ui-bg:#fbeef1; --cross:#8a6d1a; --cross-bg:#fff7e6;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#141414;--ink:#ededed;--sub:#a5a5a5;--line:#2e2e2e;--chip:#1c1c1c;
+      --ingest-bg:#12233a;--pipe-bg:#0f2a1c;--prov-bg:#241a3a;--data-bg:#2a2010;--know-bg:#0f2a30;--sync-bg:#20222a;--ui-bg:#2a141b;--cross-bg:#241f0e;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter","Noto Sans TC",system-ui,sans-serif;padding:26px 28px 34px}
+  h1{font-size:22px;margin:0 0 3px}
+  .sub{font-size:12.5px;color:var(--sub);margin-bottom:14px;line-height:1.5}
+  .stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .stat{border:1px solid var(--line);border-radius:9px;padding:7px 12px;background:var(--chip)}
+  .stat b{font-size:16px}.stat span{display:block;font-size:10.5px;color:var(--sub)}
+  .layout{display:grid;grid-template-columns:1fr 246px;gap:14px;align-items:stretch}
+  .bands{display:flex;flex-direction:column;gap:11px}
+  .band{border:1px solid var(--line);border-left:5px solid var(--acc,#999);border-radius:11px;padding:10px 12px 12px;background:var(--bandbg,#fafafa)}
+  .band h2{font-size:12.5px;margin:0 0 8px;color:var(--acc);letter-spacing:.01em}
+  .band h2 small{color:var(--sub);font-weight:500;letter-spacing:0}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{background:var(--chip);border:1.3px solid var(--acc);border-radius:8px;padding:6px 9px;min-width:96px;flex:1 1 0}
+  .chip b{font-size:11px;font-weight:650;display:block;line-height:1.25}
+  .chip em{font-style:normal;font-size:9.5px;color:var(--sub);font-family:ui-monospace,monospace}
+  .chip.star{box-shadow:0 0 0 2px var(--data-bg);border-width:2px}
+  .rail{border:1px solid var(--line);border-top:5px solid var(--cross);border-radius:11px;background:var(--cross-bg);padding:11px 12px}
+  .rail h2{font-size:12.5px;margin:0 0 9px;color:var(--cross)}
+  .ritem{background:var(--chip);border:1.2px solid var(--cross);border-radius:8px;padding:7px 9px;margin-bottom:8px}
+  .ritem b{font-size:11px;display:block;line-height:1.25}.ritem em{font-style:normal;font-size:9.5px;color:var(--sub)}
+  .flowtag{font-size:10px;color:var(--sub);text-align:center;margin:1px 0}
+  .foot{margin-top:16px;font-size:11px;color:var(--sub);line-height:1.6;border-top:1px solid var(--line);padding-top:10px}
+</style>
+
+<h1>Plimsoll 目標架構（規格 §19–32）· 深度總覽</h1>
+<div class="sub">local-first · 檔案化無 DB · append-only 稽核（防竄改）· 分析模式 A/B/C 可切換 · 雙雲（Bedrock 先接）· RAG／知識庫／特徵層 · SFI 影響視圖 2D→3D</div>
+
+<div class="stats">
+  <div class="stat"><b>7 + 1</b><span>架構層（＋貫穿層）</span></div>
+  <div class="stat"><b>§19–32</b><span>決策 14 條</span></div>
+  <div class="stat"><b>~30</b><span>介面/模組</span></div>
+  <div class="stat"><b>3</b><span>Provider 家族</span></div>
+  <div class="stat"><b>4</b><span>知識層</span></div>
+  <div class="stat"><b>3</b><span>分析模式 A/B/C</span></div>
+  <div class="stat"><b>檔案化</b><span>＋可選 DB 上游</span></div>
+</div>
+
+<div class="layout">
+  <div class="bands">
+
+    <div class="band" style="--acc:var(--ingest);--bandbg:var(--ingest-bg)">
+      <h2>① INGEST <small>本機檔案輸入</small></h2>
+      <div class="chips">
+        <div class="chip"><b>本機雙 PDF 輸入</b><em>File System Access</em></div>
+        <div class="chip"><b>頁面分類</b><em>text / scan / diagram</em></div>
+        <div class="chip"><b>PyMuPDF 抽字</b><em>快·§27</em></div>
+        <div class="chip"><b>OCR OSS→雲端</b><em>Tesseract/Paddle→Textract/DocAI</em></div>
+        <div class="chip"><b>頁雜湊短路</b><em>跳過未變頁</em></div>
+        <div class="chip"><b>雙頁碼</b><em>pdf_page / print_label</em></div>
+      </div>
+    </div>
+    <div class="flowtag">▼ 偵測</div>
+
+    <div class="band" style="--acc:var(--pipe);--bandbg:var(--pipe-bg)">
+      <h2>② DETECTION PIPELINE <small>Stage 0–4</small></h2>
+      <div class="chips">
+        <div class="chip"><b>Stage0 正規化</b><em>NFKC · CJK 斷詞</em></div>
+        <div class="chip"><b>Stage1 結構對齊</b><em>SFI / 條號</em></div>
+        <div class="chip"><b>Stage2 規則引擎</b><em>rulesets v{N}（確定性）</em></div>
+        <div class="chip"><b>Stage3 LLM 語意</b><em>殘差路由</em></div>
+        <div class="chip"><b>Stage4 人工覆核</b><em>最終判定</em></div>
+      </div>
+    </div>
+    <div class="flowtag">▼ 判定經 Provider</div>
+
+    <div class="band" style="--acc:var(--prov);--bandbg:var(--prov-bg)">
+      <h2>③ PROVIDERS <small>Strategy · analysis_mode A/B/C 可切換</small></h2>
+      <div class="chips">
+        <div class="chip"><b>LlmProvider</b><em>Bedrock→Vertex→OpenAI→local</em></div>
+        <div class="chip"><b>EmbeddingProvider</b><em>e5-small(預設)→Bedrock→Vertex</em></div>
+        <div class="chip"><b>OCR Provider</b><em>Tesseract/Paddle→Textract/DocAI</em></div>
+      </div>
+    </div>
+    <div class="flowtag">▼ 寫入</div>
+
+    <div class="band" style="--acc:var(--data);--bandbg:var(--data-bg)">
+      <h2>④ DOMAIN DATA <small>檔案化，無 DB（local-first）</small></h2>
+      <div class="chips">
+        <div class="chip"><b>sessions.json</b><em>一次寫入</em></div>
+        <div class="chip"><b>differences.json</b><em>+features/component_ref/data_origin</em></div>
+        <div class="chip star"><b>review_events.jsonl ★</b><em>append-only 稽核</em></div>
+        <div class="chip"><b>config/</b><em>roles·rulesets·policies·taxonomy</em></div>
+      </div>
+    </div>
+    <div class="flowtag">▼ 累積</div>
+
+    <div class="band" style="--acc:var(--know);--bandbg:var(--know-bg)">
+      <h2>⑤ KNOWLEDGE <small>§30–32</small></h2>
+      <div class="chips">
+        <div class="chip"><b>RAG（per-session）</b><em>rag_index.jsonl §30</em></div>
+        <div class="chip"><b>知識庫 KB</b><em>跨 session · §32 第二主線</em></div>
+        <div class="chip"><b>特徵層</b><em>embedding_distance · §31</em></div>
+        <div class="chip"><b>Audit→Labels</b><em>標籤飛輪</em></div>
+      </div>
+    </div>
+    <div class="flowtag">▼ 可選上游</div>
+
+    <div class="band" style="--acc:var(--sync);--bandbg:var(--sync-bg)">
+      <h2>⑥ SYNC <small>可選；DB 為下游鏡像；不影響啟動</small></h2>
+      <div class="chips">
+        <div class="chip"><b>StorageGateway</b><em>commit 點=本機</em></div>
+        <div class="chip"><b>完整性驗證</b><em>凍結前綴 hash</em></div>
+        <div class="chip"><b>SyncTarget</b><em>SQLite / PG / MySQL</em></div>
+        <div class="chip"><b>三態 tag</b><em>本機/未同步/已同步</em></div>
+      </div>
+    </div>
+    <div class="flowtag">▼ 呈現</div>
+
+    <div class="band" style="--acc:var(--ui);--bandbg:var(--ui-bg)">
+      <h2>⑦ PRESENTATION <small>三欄 UI</small></h2>
+      <div class="chips">
+        <div class="chip"><b>HistoryRail</b><em>紀錄/排序</em></div>
+        <div class="chip"><b>對話+Composer</b><em>RAG 引用</em></div>
+        <div class="chip"><b>SidePanel</b><em>原文/來源</em></div>
+        <div class="chip"><b>DiffCard</b><em>覆核+鍵盤</em></div>
+        <div class="chip"><b>影響視圖</b><em>2D→3D（SFI）</em></div>
+        <div class="chip"><b>DB 狀態點</b><em>連線指示</em></div>
+        <div class="chip"><b>匯出</b><em>DOCX/HTML/PDF/audit.xlsx</em></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rail">
+    <h2>貫穿關注點 · Cross-cutting</h2>
+    <div class="ritem"><b>Provenance 快照</b><em>model_id / ruleset_version</em></div>
+    <div class="ritem"><b>data_origin 三態</b><em>computed / ai_inferred / demo_seed</em></div>
+    <div class="ritem"><b>#5 資料來源白名單</b><em>禁 DNV/LR/ABS 進索引</em></div>
+    <div class="ritem"><b>#8 文案守則</b><em>禁未證實因果斷言</em></div>
+    <div class="ritem"><b>稽核不可覆寫</b><em>append-only + 投影</em></div>
+    <div class="ritem"><b>分析模式 knob</b><em>A rules-first(預設)/B/C</em></div>
+    <div class="ritem"><b>成本分層</b><em>便宜預設·殘差升級·快取</em></div>
+  </div>
+</div>
+
+<div class="foot">
+  <b>深度對照：</b>現有 tag/1.1.0＝單體、目錄深度 3、引擎 ~730 LOC、diff 靠 SequenceMatcher＋寫死規則（玩具）。
+  目標架構＝ 7 層＋1 貫穿層、~30 介面/模組、3 個 Provider Strategy 家族、4 個知識層、append-only 稽核脊椎、可切換分析模式。
+  <b>這才是「規格開出來的架構深度」。</b>本圖對應決策檔 §19–32，未落地程式（本輪只寫規格）。
+</div>

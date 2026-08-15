@@ -1,0 +1,288 @@
+<meta charset="utf-8">
+<title>Plimsoll 架構設計對話紀錄</title>
+<style>
+  :root{
+    --bg:#f5f5f5; --page:#ffffff; --ink:#161616; --sub:#5a5a5a; --line:#e4e4e7; --soft:#f3f3f4;
+    --ask:#2f6db0; --ask-bg:#eaf2fb; --out:#1f7a44; --out-bg:#eef7f1;
+    --tag-disc:#6b46c1; --tag-disc-bg:#f1ecfb; --tag-dec:#b5761a; --tag-dec-bg:#fbf3e8; --tag-commit:#1f7a44; --tag-commit-bg:#e9f5ee;
+    --accent:#161616;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#0e0e0e;--page:#181818;--ink:#ededed;--sub:#a5a5a5;--line:#2c2c2c;--soft:#202020;
+      --ask-bg:#12233a;--out-bg:#0f2a1c;--tag-disc-bg:#241a3a;--tag-dec-bg:#2a2010;--tag-commit-bg:#0f2a1c;--accent:#ededed;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Inter","Noto Sans TC",system-ui,sans-serif;line-height:1.55}
+  .page{background:var(--page);max-width:860px;margin:22px auto;padding:34px 40px 40px;border:1px solid var(--line);border-radius:14px;min-height:80vh;position:relative}
+  @media print{ .page{margin:0;border:none;border-radius:0;min-height:100vh;page-break-after:always;max-width:none} body{background:#fff} }
+  .pnum{position:absolute;top:18px;right:22px;font-size:11px;color:var(--sub);font-family:ui-monospace,monospace}
+  .cover h1{font-size:30px;margin:6px 0 4px}
+  .cover .lead{font-size:14px;color:var(--sub);margin-bottom:20px}
+  .cover h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:20px 0 8px}
+  .toc{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:5px 22px}
+  .toc li{font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--line);display:flex;gap:8px}
+  .toc .r{font-family:ui-monospace,monospace;color:var(--ask);font-weight:700;min-width:30px}
+  .finals{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:12.5px}
+  .finals b{color:var(--accent)}
+  .rhd{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .rchip{font-family:ui-monospace,monospace;font-size:12px;font-weight:800;background:var(--accent);color:var(--page);border-radius:7px;padding:2px 9px}
+  .rtitle{font-size:20px;font-weight:750;margin:0}
+  .status{font-size:10px;font-weight:800;padding:2px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em}
+  .s-disc{background:var(--tag-disc-bg);color:var(--tag-disc)} .s-dec{background:var(--tag-dec-bg);color:var(--tag-dec)} .s-commit{background:var(--tag-commit-bg);color:var(--tag-commit)}
+  .blk{border-radius:10px;padding:12px 15px;margin-top:12px}
+  .blk.ask{background:var(--ask-bg);border-left:4px solid var(--ask)}
+  .blk.out{background:var(--out-bg);border-left:4px solid var(--out)}
+  .blk .lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .blk.ask .lbl{color:var(--ask)} .blk.out .lbl{color:var(--out)}
+  .blk p{margin:0 0 6px;font-size:13px}
+  .blk ul{margin:4px 0 0;padding-left:18px}
+  .blk li{font-size:12.5px;margin-bottom:4px}
+  .mono{font-family:ui-monospace,monospace;font-size:.92em}
+  .refs{margin-top:12px;font-size:11px;color:var(--sub);border-top:1px solid var(--line);padding-top:8px}
+</style>
+
+<!-- COVER -->
+<section class="page cover">
+  <div class="pnum">封面</div>
+  <div style="font-size:12px;color:var(--sub);font-weight:700;letter-spacing:.08em">PLIMSOLL · 船舶技術文件版本差異 Agent</div>
+  <h1>架構設計對話紀錄</h1>
+  <div class="lead">系統架構決策全程 · 一輪一頁 · 2026-08-15 · 分支 <span class="mono">claude/plimsoll-architecture-decisions</span></div>
+
+  <div class="finals">
+    <b>最終落點（規格 §19–32，本輪只寫規格未動程式）：</b>
+    <ul style="margin:8px 0 0;padding-left:18px">
+      <li><b>儲存</b>：local-first、檔案化無 DB；append-only JSONL 稽核為真相來源；DB 為可選上游（灌入用），不影響啟動。</li>
+      <li><b>稽核</b>：事件流投影、不可覆寫；凍結前綴 hash 防竄改；核准角色表＋可調 rulesets。</li>
+      <li><b>分析</b>：模式 A/B/C 可切換（預設 A）；雙雲 Bedrock 先接、Vertex 次之；OCR OSS 優先分層。</li>
+      <li><b>知識</b>：RAG(per-session)＋知識庫(跨session,§32)＋特徵層(§31)＋稽核即標籤。</li>
+      <li><b>影響視圖</b>：component_ref（SFI 骨幹）＋2D；<b>3D 不納入 v1，之後再做</b>。</li>
+    </ul>
+  </div>
+
+  <h3>目錄 · 14 輪</h3>
+  <ul class="toc">
+    <li><span class="r">R1</span>開題：委任＋決策 A/B</li>
+    <li><span class="r">R2</span>不要資料庫 → 純檔案</li>
+    <li><span class="r">R3</span>沒 DB 存本地、有 DB 灌入</li>
+    <li><span class="r">R4</span>防竄改＋啟動獨立＋連線 UI</li>
+    <li><span class="r">R5</span>commit</li>
+    <li><span class="r">R6</span>寫進規格·更新分支·不碰主線</li>
+    <li><span class="r">R7</span>盤點未確認決定</li>
+    <li><span class="r">R8</span>深問：Bedrock/偵測/規模/測試</li>
+    <li><span class="r">R9</span>三路線·OCR·3D·I/O·成本</li>
+    <li><span class="r">R10</span>先看 2D·3D 為何貴·PoC</li>
+    <li><span class="r">R11</span>§25–29 草稿·雙雲·RAG 槽</li>
+    <li><span class="r">R12</span>RAG 具體·特徵·規模·靈魂質問</li>
+    <li><span class="r">R13</span>七點延伸＋架構圖修正</li>
+    <li><span class="r">R14</span>3D 不做·定案 2D·本紀錄</li>
+  </ul>
+</section>
+
+<!-- R1 -->
+<section class="page">
+  <div class="pnum">1 / 14</div>
+  <div class="rhd"><span class="rchip">R1</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">開題：系統設計委任＋決策 A / B</h2>
+  <div class="blk ask"><div class="lbl">你要</div>
+    <p>/engineering:system-design。鎖 P0–P4；需求 v3（稽核軌跡最高優先、雙頁碼一級欄位、分級門檻可設定、假資料三態、輕量可轉向、不綁 DMS）。拍板 A（儲存狀態範圍）與 B（核准角色資料模型），寫成可入 ui-spec §9 的條文。</p>
+  </div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li><b>現況體檢</b>：現行 <span class="mono">review_status</span> 可覆寫、<span class="mono">Source.page</span> 單頁、<span class="mono">_risk_and_reason</span> 寫死、<span class="mono">vision-diff</span> 回未標記假資料 → 四條最高優先需求全踩線。</li>
+      <li><b>A</b>＝最小可行持久化（稽核不可存於揮發性儲存）。<b>B</b>＝核准角色表＋可調規則。</li>
+      <li>提出 <b>§19–22</b>：儲存範圍、核准角色/規則、append-only 事件模型、雙頁碼＋data_origin。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R2 -->
+<section class="page">
+  <div class="pnum">2 / 14</div>
+  <div class="rhd"><span class="rchip">R2</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">不要資料庫 → 純檔案</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>不架 DB，改用 Google Sheet／Excel／txt 留存。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>選 <b>JSONL</b> 為真相來源（唯一能真 <span class="mono">append</span>、免整檔重寫）。</li>
+      <li>Excel／CSV 降為<b>匯出視圖</b>；Google Sheet 因需求 #5（雲端/Drive）v1 不採。</li>
+      <li>§19–22 改檔案版；規則搬進 <span class="mono">config/rulesets/v{N}.json</span>，配置 <span class="mono">data/store/</span>。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R3 -->
+<section class="page">
+  <div class="pnum">3 / 14</div>
+  <div class="rhd"><span class="rchip">R3</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">沒 DB 存本地、有 DB 就把本地資料灌入</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>沒連線就存本地化；連上 DB 後要能把本地資料存進 DB。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li><b>local-first ＋ DB 可選上游</b>；DB 永遠是下游鏡像。</li>
+      <li>關鍵：append-only 事件日誌（每筆 <span class="mono">event_id</span>）＝<b>免衝突同步協定</b>，同步只是 idempotent 往前補。</li>
+      <li><b>§23</b> SyncTarget 契約；三態 tag（本機／未同步／已同步）由 <span class="mono">sync_state.json</span> 推導。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R4 -->
+<section class="page">
+  <div class="pnum">4 / 14</div>
+  <div class="rhd"><span class="rchip">R4</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">防竄改＋啟動不受 DB 影響＋介面顯示連線</h2>
+  <div class="blk ask"><div class="lbl">你要（連續補充）</div>
+    <p>讀檔時整份 hash 快照存別處、灌 DB 前比對，不一致告警並略過；DB 不能影響程式啟動；設定裡要看得到有沒有連上 DB（新前端工作）。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li><b>凍結前綴 hash 錨點</b>（相容 append-only 的合法成長）；不一致 → 告警＋略過＋隔離待人工。</li>
+      <li><b>§24</b>：啟動只讀本機、DB 延遲背景探測、失敗降級本機、永不阻塞。</li>
+      <li>ui-spec §3.4 加「資料庫同步」狀態區（綠/灰燈、待同步數、手動同步、完整性告警）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R5 -->
+<section class="page">
+  <div class="pnum">5 / 14</div>
+  <div class="rhd"><span class="rchip">R5</span><span class="status s-commit">COMMIT</span></div>
+  <h2 class="rtitle">commit</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>commit。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul><li>決策檔 <span class="mono">architecture-decisions-A-B.md</span> 首次 commit 到 <span class="mono">claude/…</span> 分支，未碰 main。</li></ul>
+  </div>
+</section>
+
+<!-- R6 -->
+<section class="page">
+  <div class="pnum">6 / 14</div>
+  <div class="rhd"><span class="rchip">R6</span><span class="status s-commit">COMMIT</span></div>
+  <h2 class="rtitle">寫進規格 · 更新分支 · 永不碰主線</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>v1＝寫進規格即可；把分支更新到最新；你永遠不該改我的主線。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>發現最新規格在 <span class="mono">tag/1.1.0</span>；<b>rebase 我的分支到 tag/1.1.0</b>（只移我的分支，不動 main/tag）。</li>
+      <li>§19–24 寫進 <span class="mono">ui-spec §9</span>、§3.4 加 DB 狀態區；commit。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R7 -->
+<section class="page">
+  <div class="pnum">7 / 14</div>
+  <div class="rhd"><span class="rchip">R7</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">盤點「我自作主張、你沒確認」的</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>還有哪些問題我沒回答到你，或你先決定但沒跟我確認過的？</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>列 7 項自主決定＋開放問題；四問拍板。</li>
+      <li>你的答：<b>只寫規格</b>／<b>本機永遠為主（push-only）</b>／<b>單人單機</b>／<b>留我的分支</b>。</li>
+      <li>記錄 v1 前提並 commit。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R8 -->
+<section class="page">
+  <div class="pnum">8 / 14</div>
+  <div class="rhd"><span class="rchip">R8</span><span class="status s-disc">討論</span></div>
+  <h2 class="rtitle">深問：Bedrock／偵測／規模／演算法／模式／測試</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>如何和 Bedrock 協作？如何正確判斷異動（法規/稽核/內規/隱含/語意）？能撐多少量？有無省 token/提正確率小工具？設計模式？要不要 E2E？</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li><b>兩層原則</b>：確定性定位「哪裡變」＋LLM 只解讀「變什麼」；LLM 永非必要相依、永不定最終風險級。</li>
+      <li>偵測管線 Stage 0–4；規模瓶頸＝LLM 呼叫數；小工具：頁雜湊短路、CJK 斷詞、結構對齊、快取。</li>
+      <li>設計模式盤點；<b>測試前移 P0</b>（現況零測試，舊 Playwright 針對被棄用的 UI）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R9 -->
+<section class="page">
+  <div class="pnum">9 / 14</div>
+  <div class="rhd"><span class="rchip">R9</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">換模型？三路線＋OCR＋3D＋I/O＋成本</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>換模型影響？三種確定性/LLM 比重路線、雙雲、大量圖片/掃描、上千頁 I/O、成本衝突要討論，討論完寫成章節。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>分析模式 A/B/C 做成 <b>knob</b>（換模型影響取決於路線；B/C 會漂移，A 可重現）。</li>
+      <li>OCR 分層、I/O 頁雜湊/PyMuPDF、成本總表。</li>
+      <li>四問 → <b>可切換預設 A</b>／<b>OCR OSS 優先</b>／<b>AWS+GCP 同時</b>／3D 先看 2D＋問為何貴。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R10 -->
+<section class="page">
+  <div class="pnum">10 / 14</div>
+  <div class="rhd"><span class="rchip">R10</span><span class="status s-disc">討論</span></div>
+  <h2 class="rtitle">先看 2D · 3D 為何貴 · 串接 PoC</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>2D 長怎樣我想看；3D 資產為何貴。→ 再要求：做一個簡易串接假的 PoC。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>互動 2D 影響示意；說明 3D 貴在<b>逐船 CAD／零件切分／ID 對映</b>（資料授權問題，非渲染）。</li>
+      <li>做出<b>串接 PoC</b>：差異 → <span class="mono">component_ref</span> → 對映 taxonomy → 高亮節點（示範資料標 <span class="mono">demo_seed</span>）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R11 -->
+<section class="page">
+  <div class="pnum">11 / 14</div>
+  <div class="rhd"><span class="rchip">R11</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">§25–29 章節草稿 · PyMuPDF · 雙雲 · RAG 槽</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>先不 commit（要微調）；PyMuPDF 目前 demo 不算商用？確認雙雲；預留一個 RAG 架構位置。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li><b>§25–29</b> 進草稿（分析模式/OCR/效能/影響視圖/成本）。</li>
+      <li>PyMuPDF AGPL：demo／鐵人賽非閉源商用 → 可接受。</li>
+      <li><b>§30</b> RAG 預留位置（語料限本機自有文件）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R12 -->
+<section class="page">
+  <div class="pnum">12 / 14</div>
+  <div class="rhd"><span class="rchip">R12</span><span class="status s-disc">討論</span></div>
+  <h2 class="rtitle">RAG 具體 · 特徵工程 · 規模 · 靈魂質問</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>RAG 更具體、embedding 用本機小模型、雙雲 Bedrock 先接；有無特徵工程？codebase 多大給我圖；這專案真的解決到使用者問題嗎？</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>§30 具體化（<span class="mono">e5-small</span> 預設、chunk 結構、白名單、Bedrock 先接）。</li>
+      <li><b>特徵層＋稽核即標籤</b>飛輪；殺手級特徵 <span class="mono">embedding_distance</span>。</li>
+      <li>靈魂回答：架構穩、但風險在「<b>問題未經驗證</b>」；稽核軌跡是真護城河，建議當主打。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R13 -->
+<section class="page">
+  <div class="pnum">13 / 14</div>
+  <div class="rhd"><span class="rchip">R13</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">七點延伸＋架構圖修正</h2>
+  <div class="blk ask"><div class="lbl">你要</div>
+    <p>場景延伸、圖片文字怎解、輔助往哪長、參考車/機做 3D、BPMN/電簽不實際、加 §31/§32＋知識庫、切角反應。<b>（補正）</b>我要架構圖、圖要能下載、我問的是<b>規格架構深度</b>、不要 tag/1.1.0 玩具。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li>修正：產出<b>可下載目標架構圖</b>（7 層＋1 貫穿層）；深度＝§19–32／~30 模組／3 Provider 家族。</li>
+      <li>§28 加 <b>SFI 編碼骨幹</b>（＝航空 ATA／汽車 BOM 的對應）；<b>§31 特徵層</b>、<b>§32 知識庫</b>入草稿。</li>
+      <li>七點：OCR 路由（圖文→OCR、圖→vision）／輔助階梯／SFI＝編號骨幹／簽核事件即實務簽名（不需 BPMN/PKI）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- R14 -->
+<section class="page">
+  <div class="pnum">14 / 14</div>
+  <div class="rhd"><span class="rchip">R14</span><span class="status s-dec">決定</span></div>
+  <h2 class="rtitle">3D 不做（之後再做）· 定案 2D · 本紀錄</h2>
+  <div class="blk ask"><div class="lbl">你要</div><p>3D 不做了、之後再做，先做資料掛鉤＋2D；把整段對話分輪整理、一輪一頁做成 HTML。</p></div>
+  <div class="blk out"><div class="lbl">決定／產出</div>
+    <ul>
+      <li><b>§28 定案</b>：v1＝<span class="mono">component_ref</span> 掛鉤＋2D 影響視圖；3D 不納入 v1、之後再做。</li>
+      <li>本 HTML（一輪一頁對話全紀錄）。</li>
+      <li>待辦：§25–32＋架構圖＋本紀錄尚<b>未 commit</b>，等你點頭。</li>
+    </ul>
+  </div>
+  <div class="refs">全部決定明細見 <span class="mono">docs/redesign/architecture-decisions-A-B.md</span>（§19–32）與 <span class="mono">ui-spec.md §9 / §3.4</span>。架構圖見 <span class="mono">plimsoll-architecture-diagram.html</span>。</div>
+</section>
