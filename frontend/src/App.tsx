@@ -14,8 +14,6 @@ export default function App() {
   const [role, setRole] = useState<Role>('engineer');
   const [activeTab, setActiveTab] = useState<'comparison' | 'timeline' | 'slides-mindmap' | 'differentiator'>('comparison');
   const [provider, setProvider] = useState<string>('AWS Bedrock (Claude 3.5 Sonnet)');
-  const [apiKey, setApiKey] = useState<string>('');
-  const [language, setLanguage] = useState<string>('繁中');
 
   const [differences, setDifferences] = useState<Difference[]>([]);
   const [oldMeta, setOldMeta] = useState<DocMetadata>({ title: '', version: 'v1.0', date: '', is_complete: true, missing_fields: [] });
@@ -83,40 +81,42 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans relative">
+      
+      {/* Clean Header Bar */}
       <Header
         role={role}
         onRoleChange={setRole}
         provider={provider}
         onProviderChange={setProvider}
-        apiKey={apiKey}
-        onApiKeyChange={setApiKey}
-        language={language}
-        onLanguageChange={setLanguage}
         activeTab={activeTab}
         onTabChange={setActiveTab}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+      {/* Main Container with Spacious Spacing */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        {/* Simple Action Bar */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={loadDemoData}
               disabled={isLoading}
-              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2"
+              className="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-semibold transition-all shadow-sm flex items-center gap-2"
             >
               <Play className="w-4 h-4" />
-              {isLoading ? '載入中...' : '載入 6 頁合成 Demo'}
+              {isLoading ? '載入數據中...' : '載入 Demo 比對數據'}
             </button>
             <span className="text-xs text-slate-400">
-              AI 調度代理引擎：<strong className="text-teal-300 font-semibold">{provider}</strong>
+              Demo PDF：<span className="text-slate-300 font-mono">Main_Engine_Cooling_v1.0.pdf</span> vs <span className="text-slate-300 font-mono">v1.1.pdf</span>
             </span>
           </div>
 
           <div className="text-xs text-slate-400">
-            全域可追溯差異：<strong className="text-teal-400 font-bold">{differences.length} 筆</strong>
+            已載入條文差異：<strong className="text-teal-400 font-bold">{differences.length} 筆</strong>
           </div>
         </div>
 
+        {/* Tab View Switching */}
         {activeTab === 'differentiator' && <NotebookLMDifferentiator />}
         {activeTab === 'timeline' && <MultiVersionTimeline />}
         {activeTab === 'slides-mindmap' && (
@@ -125,8 +125,6 @@ export default function App() {
 
         {activeTab === 'comparison' && (
           <div className="space-y-8">
-            <NotebookLMDifferentiator />
-
             {role === 'manager' ? (
               <ManagerDashboard
                 differences={differences}
@@ -156,8 +154,8 @@ export default function App() {
         onProviderChange={setProvider}
       />
 
-      <footer className="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
-        AI 船舶技術文件版本差異 Agent • Vite + React + Tailwind CSS × FastAPI 引擎
+      <footer className="border-t border-slate-800/80 py-4 text-center text-xs text-slate-500">
+        AI 船舶技術文件版本差異 Agent • S1000D 精準對照與審查簽核
       </footer>
     </div>
   );
