@@ -144,14 +144,14 @@ def test_playwright_browser_ui():
             print("  ✓ NotebookLM Differentiator component rendered.")
 
             # Switch back to comparison tab and test Role Switching
-            page.get_by_role("button", name="條文對照審查").click()
+            page.get_by_role("button", name="條文對照與審查").click()
             time.sleep(0.5)
 
             manager_btn = page.get_by_role("button", name="安品主管")
             manager_btn.click()
             time.sleep(1)
 
-            page.wait_for_selector("text=安品與技術主管", timeout=5000)
+            page.wait_for_selector("text=工安風險與審查簽核控管", timeout=5000)
             print("  ✓ Role Switcher toggled to Safety Manager View successfully.")
 
             browser.close()
