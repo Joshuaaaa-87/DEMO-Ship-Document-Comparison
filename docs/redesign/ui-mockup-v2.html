@@ -1,0 +1,2010 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plimsoll — UI/UX 設計稿 v2（完整版）</title>
+<style>
+/* ══════════ 淺色（預設）══════════ */
+:root{
+  color-scheme:light;
+  --ink-900:#000000; --ink-800:#171717; --ink-700:#333333; --ink-600:#575757;
+  --ink-500:#818181; --ink-400:#A5A5A5; --ink-300:#C9C9C9;
+  --line:#E3E3E3; --line-soft:#EDEDED;
+  --surface:#FFFFFF; --surface-2:#FAFAFA; --canvas:#F5F5F5; --rail:#FAFAFA;
+  --accent:#171717; --accent-hi:#000000; --accent-soft:#F1F1F1; --accent-line:#E3E3E3;
+  --on-accent:#FFFFFF;
+  --high-700:#B3241B; --high-500:#CE3A31; --high-200:#F0CDCA; --high-50:#FBF2F1;
+  --med-700:#8E540C;  --med-500:#C07C1A;  --med-200:#EADCBE;  --med-50:#FAF6EE;
+  --low-700:#14603F;  --low-500:#248A5F;  --low-200:#C7E2D5;  --low-50:#F1F7F3;
+  --mark:#F3E6C4; --mark-hit:#F6D6D2;
+  --note-bg:#FAFAFA; --note-line:#E3E3E3; --note-bar:#171717; --note-fg:#575757; --note-b:#000000;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:999px;
+  --sh-1:0 1px 2px rgba(0,0,0,.04);
+  --sh-2:0 2px 10px rgba(0,0,0,.06);
+  --sh-3:0 16px 44px rgba(0,0,0,.18);
+  --t-caption:11.5px; --t-sm:12.5px; --t-body:13.5px; --t-md:15px;
+  --t-lg:18px; --t-xl:22px; --t-display:28px;
+}
+/* ══════════ 深色 ══════════ */
+[data-theme="dark"]{
+  color-scheme:dark;
+  --ink-900:#FFFFFF; --ink-800:#EDEDED; --ink-700:#D6D6D6; --ink-600:#A5A5A5;
+  --ink-500:#818181; --ink-400:#666666; --ink-300:#4A4A4A;
+  --line:#2E2E2E; --line-soft:#242424;
+  --surface:#1B1B1B; --surface-2:#212121; --canvas:#141414; --rail:#171717;
+  --accent:#FFFFFF; --accent-hi:#FFFFFF; --accent-soft:#282828; --accent-line:#3A3A3A;
+  --on-accent:#0F0F0F;
+  --high-700:#F0837A; --high-500:#D34A41; --high-200:#5C2B27; --high-50:#2A1918;
+  --med-700:#E3AE5E;  --med-500:#B98524;  --med-200:#54401B;  --med-50:#251E12;
+  --low-700:#63C79B;  --low-500:#2E9268;  --low-200:#24503E;  --low-50:#152420;
+  --mark:#4A3D18; --mark-hit:#4E2622;
+  --note-bg:#1F1F1F; --note-line:#2E2E2E; --note-bar:#FFFFFF; --note-fg:#A5A5A5; --note-b:#EDEDED;
+  --sh-1:0 1px 2px rgba(0,0,0,.4); --sh-2:0 2px 10px rgba(0,0,0,.5); --sh-3:0 16px 44px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:"Inter","Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC","Microsoft JhengHei",sans-serif;
+  background:var(--canvas);color:var(--ink-700);font-size:var(--t-body);line-height:1.6}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+.mono,code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+
+/* ══════════ 設計稿外框（產品不含此層）══════════ */
+.deck{max-width:1500px;margin:0 auto;padding:24px 18px 80px}
+.deck-head{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.deck-head h1{font-size:var(--t-xl);color:var(--ink-900);letter-spacing:-.02em}
+.deck-head p{color:var(--ink-500);margin-top:3px;font-size:var(--t-sm)}
+.deck-ctrl{margin-left:auto;display:flex;gap:8px;align-items:center}
+.tgl{display:flex;align-items:center;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:3px}
+.tgl button{padding:5px 11px;border-radius:5px;font-size:var(--t-sm);font-weight:600;color:var(--ink-500)}
+.tgl button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.screen-picker{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;padding:5px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-1)}
+.screen-picker button{padding:6px 11px;border-radius:var(--r-sm);font-size:var(--t-sm);font-weight:600;color:var(--ink-600)}
+.screen-picker button:hover{background:var(--surface-2);color:var(--ink-900)}
+.screen-picker button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.note{display:flex;gap:10px;background:var(--note-bg);border:1px solid var(--note-line);border-left:3px solid var(--note-bar);
+  border-radius:var(--r-md);padding:11px 14px;font-size:var(--t-sm);color:var(--note-fg);margin-bottom:14px}
+.note b{color:var(--note-b)}
+body.hide-notes .note{display:none}
+.frame{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:var(--sh-2);position:relative}
+.screen{display:none}.screen.is-on{display:block}
+
+/* ══════════ TopBar ══════════ */
+.topbar{height:52px;background:var(--surface);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:13px;padding:0 13px;position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:9px}
+.mark{width:28px;height:28px;flex:none;color:var(--ink-900)}
+.brand-name{font-size:var(--t-md);font-weight:750;color:var(--ink-900);letter-spacing:-.02em;line-height:1.15}
+.brand-sub{font-size:10.5px;color:var(--ink-400);letter-spacing:.02em}
+.docpair{display:flex;align-items:center;gap:7px;padding:4px 11px;background:var(--accent-soft);
+  border:1px solid var(--accent-line);border-radius:var(--r-full);font-size:var(--t-sm);color:var(--ink-800);white-space:nowrap}
+.docpair .v{font-weight:700;font-family:ui-monospace,Menlo,monospace}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:5px}
+.icon-btn{width:31px;height:31px;border-radius:var(--r-md);display:grid;place-items:center;color:var(--ink-500);
+  border:1px solid transparent;position:relative}
+.icon-btn:hover{background:var(--surface-2);border-color:var(--line);color:var(--ink-900)}
+.icon-btn.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--ink-900)}
+.icon-btn .badge{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;
+  background:var(--med-500);border:1.5px solid var(--surface)}
+
+/* ══════════ 三欄骨架 ══════════ */
+.shell{display:grid;grid-template-columns:238px minmax(0,1fr) 344px;height:684px;background:var(--canvas)}
+.shell.lcol{grid-template-columns:50px minmax(0,1fr) 344px}
+.shell.rcol{grid-template-columns:238px minmax(0,1fr) 46px}
+.shell.lcol.rcol{grid-template-columns:50px minmax(0,1fr) 46px}
+
+/* ── 左欄：對話紀錄 ── */
+.histrail{background:var(--rail);border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.hist-top{padding:10px 10px 8px;display:flex;align-items:center;gap:6px}
+.newbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;border-radius:var(--r-md);
+  background:var(--accent);color:var(--on-accent);font-size:var(--t-sm);font-weight:650;box-shadow:var(--sh-1);white-space:nowrap}
+.newbtn:hover{opacity:.88}
+.mini-btn{width:29px;height:29px;flex:none;border-radius:var(--r-md);display:grid;place-items:center;
+  color:var(--ink-500);border:1px solid var(--line);background:var(--surface)}
+.mini-btn:hover{color:var(--ink-900);background:var(--surface-2)}
+.mini-btn[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.hist-search{margin:0 10px 8px;position:relative}
+.hist-search input{width:100%;padding:6px 9px 6px 26px;border:1px solid var(--line);border-radius:var(--r-sm);
+  font-size:var(--t-sm);background:var(--surface)}
+.hist-search svg{position:absolute;left:8px;top:7px;color:var(--ink-400)}
+.sortbar{display:flex;align-items:center;gap:5px;padding:0 10px 8px}
+.sortbar select{flex:1;padding:5px 7px;border:1px solid var(--line);border-radius:var(--r-sm);
+  font-size:11.5px;background:var(--surface);color:var(--ink-600)}
+.hist-list{flex:1;overflow:auto;padding:0 7px 10px}
+.hist-grp{font-size:10px;font-weight:700;color:var(--ink-400);text-transform:uppercase;letter-spacing:.07em;padding:8px 6px 4px}
+.hist-item{display:flex;gap:6px;width:100%;text-align:left;padding:7px 8px;border-radius:var(--r-md);
+  margin-bottom:2px;border-left:2px solid transparent;align-items:flex-start;position:relative}
+.hist-item:hover{background:var(--surface)}
+.hist-item[aria-current="true"]{background:var(--surface);border-left-color:var(--accent);box-shadow:var(--sh-1)}
+.hist-item.dragging{background:var(--surface);box-shadow:var(--sh-2);opacity:.9;outline:1px dashed var(--ink-300)}
+.drag{width:12px;flex:none;color:var(--ink-300);opacity:0;cursor:grab;margin-top:2px}
+.hist-item:hover .drag{opacity:1}
+.hist-item .bd{flex:1;min-width:0}
+.hist-item .ti{font-size:var(--t-sm);font-weight:620;color:var(--ink-800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-item .mt{font-size:10px;color:var(--ink-400);display:flex;align-items:center;gap:5px;margin-top:2px;flex-wrap:wrap}
+.hist-item .mt .vv{font-family:ui-monospace,Menlo,monospace}
+.drop-line{height:2px;background:var(--accent);border-radius:2px;margin:2px 8px}
+.hist-foot{border-top:1px solid var(--line);padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:var(--t-caption);color:var(--ink-500)}
+.avatar{width:23px;height:23px;border-radius:50%;background:var(--accent-soft);color:var(--ink-800);
+  display:grid;place-items:center;font-size:10px;font-weight:800;flex:none;border:1px solid var(--accent-line)}
+.shell.lcol .hist-search,.shell.lcol .sortbar,.shell.lcol .hist-list,
+.shell.lcol .hist-foot span,.shell.lcol .newbtn span{display:none}
+.shell.lcol .hist-top{flex-direction:column;padding:10px 8px;gap:5px}
+.shell.lcol .newbtn{width:32px;height:32px;flex:none;padding:0}
+.shell.lcol .hist-foot{justify-content:center;padding:8px 0}
+
+/* 儲存位置小標 */
+.tag{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:4px;font-size:9.5px;
+  font-weight:700;letter-spacing:.02em;white-space:nowrap;border:1px solid var(--line);color:var(--ink-500);background:var(--surface)}
+.tag.remote{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.tag.drive{background:var(--surface);color:var(--ink-700);border-color:var(--ink-300)}
+.tag.sync{background:var(--med-50);color:var(--med-700);border-color:var(--med-200)}
+
+/* ── 中欄：對話 ── */
+.thread-col{display:flex;flex-direction:column;min-width:0;background:var(--canvas)}
+.thread-head{padding:9px 17px;border-bottom:1px solid var(--line);background:var(--surface);
+  display:flex;align-items:center;gap:10px}
+.thread-head .tt{font-size:var(--t-body);font-weight:650;color:var(--ink-900)}
+.thread{flex:1;overflow:auto;padding:18px 17px 8px;display:flex;flex-direction:column;gap:15px}
+.msg{display:flex;gap:11px;max-width:780px}
+.msg.user{margin-left:auto;flex-direction:row-reverse}
+.msg-av{width:27px;height:27px;border-radius:var(--r-md);flex:none;display:grid;place-items:center;font-size:10px;font-weight:800}
+.msg-av.bot{background:var(--accent);color:var(--on-accent)}
+.msg-av.me{background:var(--surface);color:var(--ink-700);border:1px solid var(--line)}
+.msg-body{min-width:0;flex:1}
+.bubble{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px 15px;box-shadow:var(--sh-1)}
+.msg.user .bubble{background:var(--ink-900);color:var(--surface);border-color:var(--ink-900)}
+.msg-time{font-size:10px;color:var(--ink-400);margin-top:5px}
+.msg.user .msg-time{text-align:right}
+
+.rcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1);overflow:hidden;margin-top:10px}
+.rcard-head{padding:10px 14px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:8px}
+.rcard-head h4{font-size:var(--t-body);font-weight:700;color:var(--ink-900)}
+.rcard-head .sub{font-size:var(--t-caption);color:var(--ink-400)}
+.rcard-pad{padding:13px 14px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-soft)}
+.kpi{background:var(--surface);padding:12px 13px}
+.kpi .lbl{font-size:10.5px;color:var(--ink-500)}
+.kpi .val{font-size:var(--t-xl);font-weight:750;letter-spacing:-.025em;line-height:1.2;margin-top:2px;color:var(--ink-900)}
+.kpi .fine{font-size:10px;color:var(--ink-400)}
+.kpi.high .val{color:var(--high-700)} .kpi.done .val{color:var(--low-700)} .kpi.pend .val{color:var(--med-700)}
+.bar{height:7px;border-radius:var(--r-full);background:var(--line-soft);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:9px;font-size:var(--t-sm);color:var(--ink-500)}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.dot.ok{background:var(--low-500);box-shadow:0 0 0 3px var(--low-50)}
+.dot.idle{background:var(--ink-300)}
+
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-full);
+  font-size:var(--t-caption);font-weight:700;white-space:nowrap}
+.pill.high{background:var(--high-50);color:var(--high-700);border:1px solid var(--high-200)}
+.pill.med{background:var(--med-50);color:var(--med-700);border:1px solid var(--med-200)}
+.pill.low{background:var(--low-50);color:var(--low-700);border:1px solid var(--low-200)}
+.pill.neutral{background:var(--surface-2);color:var(--ink-600);border:1px solid var(--line)}
+.pill.ink{background:var(--accent-soft);color:var(--ink-800);border:1px solid var(--accent-line)}
+
+.diffrow{display:flex;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line-soft);align-items:flex-start;cursor:pointer}
+.diffrow:last-child{border-bottom:none}
+.diffrow:hover{background:var(--surface-2)}
+.diffrow[aria-current="true"]{background:var(--accent-soft)}
+.diffrow .st{width:16px;height:16px;border-radius:50%;flex:none;margin-top:2px;border:1.5px solid var(--ink-300);
+  display:grid;place-items:center;font-size:9px;color:#fff;background:var(--surface)}
+.diffrow .st.ok{background:var(--low-500);border-color:var(--low-500)}
+.diffrow .st.track{background:var(--med-500);border-color:var(--med-500)}
+.diffrow .m{flex:1;min-width:0}
+.diffrow .tt{font-size:var(--t-body);font-weight:620;color:var(--ink-900)}
+.diffrow .eq{font-size:var(--t-caption);color:var(--ink-400);margin-top:2px}
+.deltas{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:var(--t-sm);flex-wrap:wrap}
+.delta-old{padding:1px 8px;border-radius:var(--r-sm);background:var(--high-50);color:var(--high-700);
+  text-decoration:line-through;font-family:ui-monospace,Menlo,monospace;border:1px solid var(--high-200)}
+.delta-new{padding:1px 8px;border-radius:var(--r-sm);background:var(--low-50);color:var(--low-700);
+  font-family:ui-monospace,Menlo,monospace;font-weight:700;border:1px solid var(--low-200)}
+.srcline{font-size:var(--t-caption);color:var(--ink-800);font-family:ui-monospace,Menlo,monospace;
+  border-bottom:1px dashed var(--ink-400);cursor:pointer}
+
+.expand{border-top:1px solid var(--line-soft);background:var(--surface-2)}
+.diff-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:13px 14px}
+.diff-col .cap{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.diff-col .cap span:first-child{font-size:10.5px;font-weight:700;color:var(--ink-500)}
+.excerpt{border-radius:var(--r-md);padding:11px 12px;font-size:var(--t-sm);line-height:1.75;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-800)}
+.excerpt.new{background:var(--accent-soft);border-color:var(--accent-line)}
+.excerpt del{background:var(--high-50);color:var(--high-700);text-decoration:line-through;padding:0 3px;border-radius:3px}
+.excerpt ins{background:var(--low-50);color:var(--low-700);text-decoration:none;font-weight:700;padding:0 3px;border-radius:3px}
+.excerpt .sec{display:block;font-size:10px;color:var(--ink-400);margin-bottom:4px}
+.readout{padding:0 14px 12px;display:grid;gap:7px}
+.ro{display:grid;grid-template-columns:80px 1fr;gap:10px;font-size:var(--t-sm);align-items:start}
+.ro dt{color:var(--ink-400);font-weight:600}
+.ro dd.act{color:var(--med-700);font-weight:650}
+.review-bar{border-top:1px solid var(--line);padding:12px 14px;background:var(--surface)}
+.review-bar .lab{font-size:10.5px;font-weight:700;color:var(--ink-600);display:block;margin-bottom:7px}
+.choices{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.choice{padding:6px 12px;border-radius:var(--r-md);border:1px solid var(--line);background:var(--surface);
+  font-size:var(--t-sm);font-weight:650;color:var(--ink-600);display:flex;align-items:center;gap:5px}
+.choice[aria-pressed="true"].ok{background:var(--low-50);border-color:var(--low-500);color:var(--low-700)}
+.choice[aria-pressed="true"].track{background:var(--med-50);border-color:var(--med-500);color:var(--med-700)}
+.choice[aria-pressed="true"].no{background:var(--high-50);border-color:var(--high-500);color:var(--high-700)}
+.kbd{font-family:ui-monospace,Menlo,monospace;font-size:10px;padding:1px 5px;border-radius:4px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink-400)}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.act-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:var(--r-full);
+  border:1px solid var(--accent-line);background:var(--surface);color:var(--ink-900);font-size:var(--t-sm);font-weight:650;box-shadow:var(--sh-1)}
+.act-chip:hover{background:var(--accent-soft)}
+.act-chip.plain{color:var(--ink-600);border-color:var(--line)}
+.alert{display:flex;gap:10px;border-radius:var(--r-md);padding:11px 13px;font-size:var(--t-sm);align-items:flex-start;margin-top:10px}
+.alert .a-ico{flex:none;margin-top:1px}
+.alert b{display:block;margin-bottom:2px}
+.alert.warn{background:var(--med-50);border:1px solid var(--med-200);color:var(--med-700)}
+.alert.danger{background:var(--high-50);border:1px solid var(--high-200);color:var(--high-700)}
+.alert.info{background:var(--surface-2);border:1px solid var(--line);color:var(--ink-600)}
+.cite{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:var(--r-full);background:var(--accent-soft);
+  border:1px solid var(--accent-line);color:var(--ink-800);font-size:10px;font-weight:700;font-family:ui-monospace,Menlo,monospace}
+
+.composer{padding:11px 17px 15px;border-top:1px solid var(--line);background:var(--surface)}
+.composer-box{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);
+  box-shadow:var(--sh-1);padding:9px 10px 7px;transition:.15s}
+.composer-box:focus-within{border-color:var(--ink-500);box-shadow:0 0 0 3px var(--accent-soft)}
+.composer-box textarea{width:100%;border:none;outline:none;resize:none;font-size:var(--t-body);line-height:1.6;min-height:38px;background:transparent}
+.composer-tools{display:flex;align-items:center;gap:5px;margin-top:3px}
+.tool-btn{width:29px;height:29px;border-radius:var(--r-md);display:grid;place-items:center;color:var(--ink-400);border:1px solid transparent}
+.tool-btn:hover{background:var(--surface-2);color:var(--ink-800);border-color:var(--line)}
+.send-btn{margin-left:auto;width:31px;height:31px;border-radius:var(--r-md);background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
+.send-btn:hover{opacity:.85}
+.composer-hint{font-size:10px;color:var(--ink-400);text-align:center;margin-top:6px}
+.suggest{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.suggest button{padding:5px 11px;border-radius:var(--r-full);border:1px solid var(--line);
+  font-size:var(--t-sm);color:var(--ink-600);background:var(--surface)}
+.suggest button:hover{border-color:var(--ink-500);color:var(--ink-900);background:var(--accent-soft)}
+
+/* ── 右欄：來源 + 流程節點 ── */
+.siderail{background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.side-tabs{display:flex;gap:2px;padding:8px 10px 0;align-items:center}
+.side-tabs button.tab{flex:1;padding:7px 5px;border-radius:var(--r-md) var(--r-md) 0 0;font-size:var(--t-sm);
+  font-weight:650;color:var(--ink-500);border-bottom:2px solid transparent}
+.side-tabs button.tab[aria-pressed="true"]{color:var(--ink-900);border-bottom-color:var(--accent);background:var(--accent-soft)}
+.side-body{flex:1;overflow:auto;padding:12px 10px}
+.shell.rcol .side-tabs,.shell.rcol .side-body,.shell.rcol .flowwrap .fnode .fmeta{display:none}
+.rail-strip{display:none;flex-direction:column;align-items:center;gap:6px;padding:9px 0}
+.shell.rcol .rail-strip{display:flex}
+.rail-strip .rs{width:30px;height:30px;border-radius:var(--r-md);display:grid;place-items:center;color:var(--ink-500);border:1px solid transparent}
+.rail-strip .rs[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink-900);border-color:var(--accent-line)}
+.rail-strip .rdot{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink-300);background:var(--surface)}
+.rail-strip .rdot.done{background:var(--low-500);border-color:var(--low-500)}
+.rail-strip .rdot.now{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.rail-strip .rdot.alert{background:var(--high-500);border-color:var(--high-500)}
+
+.dropzone{border:1.5px dashed var(--ink-300);border-radius:var(--r-md);padding:18px 12px;text-align:center;
+  background:var(--surface-2);transition:.16s;margin-bottom:9px}
+.dropzone:hover{border-color:var(--ink-600);background:var(--accent-soft)}
+.dropzone .di{width:32px;height:32px;margin:0 auto 7px;border-radius:var(--r-md);background:var(--surface);
+  border:1px solid var(--line);display:grid;place-items:center;color:var(--ink-400)}
+.dropzone h5{font-size:var(--t-sm);color:var(--ink-800);font-weight:650}
+.dropzone p{font-size:10px;color:var(--ink-400);margin-top:2px}
+.slot-tag{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:var(--r-full);font-size:10px;
+  font-weight:700;margin-bottom:6px;background:var(--surface-2);color:var(--ink-600);border:1px solid var(--line)}
+.slot-tag.new{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.srcbtns{display:grid;gap:6px;margin-bottom:12px}
+.srcbtn{display:flex;align-items:center;gap:9px;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--surface);text-align:left;box-shadow:var(--sh-1)}
+.srcbtn:hover{border-color:var(--ink-500);background:var(--surface-2)}
+.srcbtn .si{width:26px;height:26px;border-radius:var(--r-sm);flex:none;display:grid;place-items:center;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink-600)}
+.srcbtn .sm{flex:1;min-width:0}
+.srcbtn .sm b{display:block;font-size:var(--t-sm);color:var(--ink-900);font-weight:640}
+.srcbtn .sm span{font-size:10px;color:var(--ink-400)}
+.fcard{border:1px solid var(--line);border-radius:var(--r-md);padding:10px 11px;background:var(--surface);margin-bottom:9px;box-shadow:var(--sh-1)}
+.fcard .row{display:flex;gap:9px;align-items:flex-start}
+.fico{width:30px;height:30px;border-radius:var(--r-sm);display:grid;place-items:center;flex:none;font-size:8.5px;
+  font-weight:800;background:var(--surface-2);color:var(--ink-600);border:1px solid var(--line)}
+.fico.new{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.fcard .nm{font-size:var(--t-sm);font-weight:650;color:var(--ink-900);word-break:break-all;line-height:1.4}
+.fcard .mt{font-size:10px;color:var(--ink-400);margin-top:2px;display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.fkv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:10.5px}
+.fkv dt{color:var(--ink-400)}
+.fkv dd{color:var(--ink-800);font-weight:600}
+.fkv dd.miss{color:var(--med-700)}
+.mini-field{margin-top:8px}
+.mini-field label{display:block;font-size:10px;font-weight:700;color:var(--ink-600);margin-bottom:3px}
+.input{padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-size:var(--t-sm);width:100%}
+.input:focus{outline:none;border-color:var(--ink-500);box-shadow:0 0 0 3px var(--accent-soft)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 15px;border-radius:var(--r-md);
+  font-size:var(--t-body);font-weight:640;transition:.14s;white-space:nowrap}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:var(--sh-1)}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{background:var(--line);color:var(--ink-400);cursor:not-allowed;box-shadow:none}
+.btn-ghost{border:1px solid var(--line);background:var(--surface);color:var(--ink-700)}
+.btn-ghost:hover{background:var(--surface-2);border-color:var(--ink-400)}
+.btn-danger{background:var(--high-500);color:#fff}
+.btn-sm{padding:6px 11px;font-size:var(--t-sm)}
+.btn-full{width:100%}
+
+.pdf-switch{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:3px;margin-bottom:8px}
+.pdf-switch button{flex:1;padding:5px;border-radius:5px;font-size:10px;font-weight:650;color:var(--ink-500)}
+.pdf-switch button[aria-pressed="true"]{background:var(--surface);color:var(--ink-900);box-shadow:var(--sh-1)}
+.page-shot{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px 12px;
+  font-size:10.5px;line-height:1.85;color:var(--ink-600);box-shadow:var(--sh-1)}
+.page-shot .pg-h{font-size:9px;color:var(--ink-400);border-bottom:1px solid var(--line-soft);padding-bottom:5px;
+  margin-bottom:8px;display:flex;justify-content:space-between;gap:6px}
+.page-shot h5{font-size:11px;color:var(--ink-900);margin:8px 0 3px}
+.page-shot mark{background:var(--mark);color:var(--ink-800);border-radius:2px;box-shadow:0 0 0 2px var(--mark)}
+.page-shot mark.hit{background:var(--mark-hit);box-shadow:0 0 0 2px var(--mark-hit);font-weight:700;color:var(--high-700)}
+.pdf-nav{display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--ink-500)}
+
+/* 流程節點（右欄下方，固定）*/
+.flowwrap{border-top:1px solid var(--line);background:var(--surface-2);padding:12px 12px 13px}
+.flowwrap .fh{font-size:9.5px;font-weight:700;color:var(--ink-400);text-transform:uppercase;letter-spacing:.08em;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.flow{display:grid;gap:0}
+.fnode{display:flex;gap:9px;align-items:flex-start;position:relative;padding-bottom:11px}
+.fnode:last-child{padding-bottom:0}
+.fnode::before{content:"";position:absolute;left:7px;top:17px;bottom:1px;width:1.5px;background:var(--line)}
+.fnode:last-child::before{display:none}
+.fnode.done::before{background:var(--low-500)}
+.fdot{width:15px;height:15px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:8px;font-weight:800;
+  background:var(--surface);border:1.5px solid var(--ink-300);color:var(--ink-400);z-index:1}
+.fnode.done .fdot{background:var(--low-500);border-color:var(--low-500);color:#fff}
+.fnode.now .fdot{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fnode.alert .fdot{background:var(--high-500);border-color:var(--high-500);color:#fff}
+.fmeta{min-width:0;flex:1;margin-top:-2px}
+.fmeta b{display:block;font-size:var(--t-sm);font-weight:650;color:var(--ink-400);line-height:1.4}
+.fnode.done .fmeta b,.fnode.alert .fmeta b{color:var(--ink-700)}
+.fnode.now .fmeta b{color:var(--ink-900);font-weight:700}
+.fmeta span{display:block;font-size:10px;color:var(--ink-400)}
+.fnode.alert .fmeta span{color:var(--high-700);font-weight:650}
+.fbar{height:4px;border-radius:var(--r-full);background:var(--line-soft);overflow:hidden;display:flex;margin-top:4px}
+.fbar i{height:100%;display:block}
+
+.todo{border:1px solid var(--line);border-radius:var(--r-md);padding:10px 11px;background:var(--surface-2);margin-top:10px}
+.todo h5{font-size:10px;font-weight:700;color:var(--ink-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.check{display:flex;align-items:flex-start;gap:8px;font-size:var(--t-sm);padding:3px 0}
+.check .b{width:16px;height:16px;border-radius:50%;flex:none;display:grid;place-items:center;color:#fff;font-size:9px;margin-top:2px}
+.check .b.ok{background:var(--low-500)}.check .b.no{background:var(--high-500)}.check .b.wait{background:var(--ink-300)}
+.exp-item{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.exp-item:last-child{border:none}
+.exp-ico{width:30px;height:30px;border-radius:var(--r-sm);display:grid;place-items:center;flex:none;font-size:8.5px;
+  font-weight:800;background:var(--surface-2);color:var(--ink-700);border:1px solid var(--line)}
+.exp-item .m b{display:block;font-size:var(--t-sm);color:var(--ink-900)}
+.exp-item .m span{font-size:10px;color:var(--ink-500)}
+
+/* ══════════ 設定面板 ══════════ */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:30}
+.pop{position:absolute;top:48px;right:11px;width:392px;max-height:610px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-lg);box-shadow:var(--sh-3);z-index:40;overflow:hidden;display:flex;flex-direction:column}
+.pop-head{padding:12px 15px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:8px}
+.pop-head h4{font-size:var(--t-body);font-weight:700;color:var(--ink-900)}
+.pop-nav{display:flex;gap:2px;padding:8px 12px 0;border-bottom:1px solid var(--line-soft);overflow-x:auto}
+.pop-nav button{padding:6px 10px;border-radius:var(--r-sm) var(--r-sm) 0 0;font-size:var(--t-sm);font-weight:640;
+  color:var(--ink-500);border-bottom:2px solid transparent;white-space:nowrap}
+.pop-nav button[aria-pressed="true"]{color:var(--ink-900);border-bottom-color:var(--accent)}
+.pop-scroll{overflow:auto;flex:1}
+.pop-sec{padding:13px 15px;border-bottom:1px solid var(--line-soft)}
+.pop-sec:last-child{border:none}
+.pop-lab{font-size:10px;font-weight:700;color:var(--ink-400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:3px;gap:2px}
+.seg button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 9px;border-radius:5px;
+  font-size:var(--t-sm);font-weight:640;color:var(--ink-500)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink-900);box-shadow:var(--sh-1)}
+.keyrow{display:flex;gap:6px}
+.status-line{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:var(--t-sm);
+  padding:8px 10px;border-radius:var(--r-sm);background:var(--low-50);border:1px solid var(--low-200);color:var(--low-700)}
+.status-line.idle{background:var(--surface-2);border-color:var(--line);color:var(--ink-500)}
+.param{display:flex;justify-content:space-between;font-size:var(--t-sm);padding:3px 0;color:var(--ink-600)}
+.param b{font-family:ui-monospace,Menlo,monospace;color:var(--ink-800)}
+.rolecard{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);
+  border-radius:var(--r-md);background:var(--surface);margin-bottom:7px;text-align:left;width:100%}
+.rolecard[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:var(--sh-1)}
+.rolecard .ri{width:28px;height:28px;border-radius:var(--r-sm);flex:none;display:grid;place-items:center;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink-700)}
+.rolecard b{display:block;font-size:var(--t-sm);color:var(--ink-900)}
+.rolecard span{font-size:10.5px;color:var(--ink-500);line-height:1.5;display:block;margin-top:2px}
+.bgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.bswatch{aspect-ratio:1.4;border-radius:var(--r-sm);border:1.5px solid var(--line);position:relative;overflow:hidden}
+.bswatch[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.bswatch .lbl{position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;color:var(--ink-500)}
+.slider{display:flex;align-items:center;gap:9px;font-size:10.5px;color:var(--ink-500);margin-top:8px}
+.slider input{flex:1;accent-color:var(--ink-800)}
+.srcconn{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid var(--line);
+  border-radius:var(--r-md);background:var(--surface);margin-bottom:7px}
+.srcconn .si{width:28px;height:28px;border-radius:var(--r-sm);flex:none;display:grid;place-items:center;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink-700)}
+.srcconn .sm{flex:1;min-width:0}
+.srcconn .sm b{display:block;font-size:var(--t-sm);color:var(--ink-900)}
+.srcconn .sm span{font-size:10px;color:var(--ink-400);word-break:break-all}
+
+.modal-wrap{position:absolute;inset:0;display:grid;place-items:center;z-index:40;padding:20px}
+.modal{width:min(500px,100%);background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-3);overflow:hidden}
+.modal-top{padding:19px 21px 0;display:flex;gap:13px}
+.modal-ico{width:40px;height:40px;border-radius:50%;background:var(--high-50);color:var(--high-700);display:grid;place-items:center;flex:none}
+.modal h3{font-size:var(--t-md);color:var(--ink-900)}
+.modal p{font-size:var(--t-body);color:var(--ink-600);margin-top:4px}
+.modal-list{margin:13px 21px;border:1px solid var(--high-200);background:var(--high-50);border-radius:var(--r-md);padding:10px 12px}
+.modal-list li{list-style:none;font-size:var(--t-sm);color:var(--high-700);display:flex;gap:8px;padding:3px 0}
+.modal-foot{padding:13px 21px 19px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--line-soft);margin-top:5px}
+
+.muted{color:var(--ink-400);font-size:var(--t-sm)}
+.hero{text-align:center;padding:24px 20px 6px;max-width:600px;margin:0 auto}
+.hero h2{font-size:var(--t-display);color:var(--ink-900);letter-spacing:-.025em;line-height:1.35}
+.hero p{font-size:var(--t-md);color:var(--ink-500);margin-top:9px}
+.hero-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px;text-align:left}
+.hcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 13px;box-shadow:var(--sh-1)}
+.hcard .hi{width:28px;height:28px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--ink-900);
+  display:grid;place-items:center;margin-bottom:8px;border:1px solid var(--accent-line)}
+.hcard b{display:block;font-size:var(--t-sm);color:var(--ink-900)}
+.hcard span{font-size:10.5px;color:var(--ink-500);line-height:1.55;display:block;margin-top:2px}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:10px}
+.sw{border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.sw .chipc{height:46px}.sw .cap{padding:7px 9px;font-size:var(--t-caption)}
+.sw .cap b{display:block;color:var(--ink-800)}.sw .cap code{color:var(--ink-400);font-size:10px}
+.typerow{display:flex;align-items:baseline;gap:16px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.typerow code{font-size:11px;color:var(--ink-400);width:148px;flex:none}
+.tokpad{padding:22px;display:grid;gap:24px}
+.logo-row{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+.logo-box{border:1px solid var(--line);border-radius:var(--r-md);padding:18px 22px;display:grid;place-items:center;gap:9px;background:var(--surface)}
+.logo-box.inv{background:var(--ink-900)}
+.logo-box.inv .lname{color:var(--surface)}
+.lname{font-size:var(--t-lg);font-weight:750;letter-spacing:-.03em;color:var(--ink-900)}
+
+/* ══════════ RWD 展示 ══════════ */
+.devices{display:flex;gap:20px;padding:20px;flex-wrap:wrap;align-items:flex-start;justify-content:center;background:var(--canvas)}
+.device{display:flex;flex-direction:column;gap:8px}
+.device .dlab{font-size:10.5px;font-weight:700;color:var(--ink-500);text-align:center;letter-spacing:.04em}
+.device .dbody{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface);box-shadow:var(--sh-2)}
+.phone .dbody{width:318px;height:600px;display:flex;flex-direction:column}
+.tablet .dbody{width:470px;height:600px;display:flex;flex-direction:column}
+.mtop{height:46px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;padding:0 11px;background:var(--surface);flex:none}
+.mtop .mname{font-size:var(--t-body);font-weight:750;color:var(--ink-900);letter-spacing:-.02em}
+.mthread{flex:1;overflow:auto;padding:13px 11px;display:flex;flex-direction:column;gap:12px;background:var(--canvas)}
+.mcomposer{border-top:1px solid var(--line);padding:9px 11px;background:var(--surface);flex:none}
+.mbox{border:1px solid var(--line);border-radius:var(--r-lg);padding:8px 9px;display:flex;align-items:center;gap:7px}
+.mbox input{flex:1;border:none;outline:none;font-size:var(--t-sm);background:transparent}
+.mtabs{display:flex;border-top:1px solid var(--line);background:var(--surface);flex:none}
+.mtabs button{flex:1;padding:8px 0 9px;display:grid;justify-items:center;gap:3px;font-size:9.5px;font-weight:650;color:var(--ink-400)}
+.mtabs button[aria-pressed="true"]{color:var(--ink-900)}
+.mtabs .mbadge{position:absolute;transform:translate(11px,-3px);min-width:14px;height:14px;border-radius:7px;
+  background:var(--high-500);color:#fff;font-size:8.5px;font-weight:800;display:grid;place-items:center;padding:0 3px}
+.mflow{display:flex;gap:0;padding:9px 11px;background:var(--surface-2);border-bottom:1px solid var(--line);flex:none;overflow-x:auto}
+.mfstep{display:flex;align-items:center;gap:5px;flex:none;padding-right:9px;position:relative}
+.mfstep::after{content:"";width:12px;height:1.5px;background:var(--line);margin-left:2px}
+.mfstep:last-child::after{display:none}
+.mfstep .md{width:14px;height:14px;border-radius:50%;display:grid;place-items:center;font-size:8px;font-weight:800;
+  background:var(--surface);border:1.5px solid var(--ink-300);color:var(--ink-400);flex:none}
+.mfstep.done .md{background:var(--low-500);border-color:var(--low-500);color:#fff}
+.mfstep.now .md{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.mfstep.alert .md{background:var(--high-500);border-color:var(--high-500);color:#fff}
+.mfstep span{font-size:9.5px;color:var(--ink-500);white-space:nowrap}
+.mfstep.now span{color:var(--ink-900);font-weight:700}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.14);padding:8px 12px 14px;max-height:78%;overflow:auto}
+.sheet .grip{width:34px;height:4px;border-radius:2px;background:var(--ink-300);margin:0 auto 10px}
+.mwrap{position:relative;flex:1;display:flex;flex-direction:column;min-height:0}
+
+/* ══════════ 視覺差異（圖片快照）══════════ */
+.vmodes{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:3px;margin-bottom:11px}
+.vmodes button{flex:1;padding:6px 4px;border-radius:5px;font-size:10.5px;font-weight:650;color:var(--ink-500)}
+.vmodes button[aria-pressed="true"]{background:var(--surface);color:var(--ink-900);box-shadow:var(--sh-1)}
+.vstage{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.vpane{position:relative}
+.vpane .vcap{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;font-size:10.5px;font-weight:700;color:var(--ink-500)}
+.snap{position:relative;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface);
+  aspect-ratio:.76;overflow:hidden;box-shadow:var(--sh-1)}
+.snap .sk{position:absolute;background:var(--line-soft);border-radius:2px}
+.snap .sk.t{height:5px}.snap .sk.h{height:8px;background:var(--ink-300)}
+.box{position:absolute;border:1.5px solid;border-radius:3px}
+.box.add{border-color:var(--low-500);background:color-mix(in srgb,var(--low-500) 14%,transparent)}
+.box.del{border-color:var(--high-500);background:color-mix(in srgb,var(--high-500) 14%,transparent)}
+.box .bl{position:absolute;top:-8px;left:-1px;font-size:8px;font-weight:800;padding:0 4px;border-radius:3px;color:#fff;white-space:nowrap}
+.box.add .bl{background:var(--low-500)}.box.del .bl{background:var(--high-500)}
+.swipe{position:relative;border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden;aspect-ratio:1.5;background:var(--surface)}
+.swipe .half{position:absolute;inset:0}
+.swipe .half.new{clip-path:inset(0 0 0 52%)}
+.swipe .handle{position:absolute;top:0;bottom:0;left:52%;width:2px;background:var(--accent)}
+.swipe .handle::after{content:"⇄";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);
+  display:grid;place-items:center;font-size:11px}
+.vlist{margin-top:11px;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.vrow{display:flex;gap:9px;align-items:center;padding:9px 11px;border-bottom:1px solid var(--line-soft);font-size:var(--t-sm)}
+.vrow:last-child{border:none}
+.vswatch{width:11px;height:11px;border-radius:3px;flex:none;border:1.5px solid}
+.vswatch.add{border-color:var(--low-500);background:color-mix(in srgb,var(--low-500) 25%,transparent)}
+.vswatch.del{border-color:var(--high-500);background:color-mix(in srgb,var(--high-500) 25%,transparent)}
+
+/* ══════════ 設定：字型與高亮 ══════════ */
+.fontrow{display:grid;grid-template-columns:1fr;gap:6px}
+.fontopt{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);
+  border-radius:var(--r-md);background:var(--surface);text-align:left;width:100%}
+.fontopt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.fontopt .fp{flex:1;min-width:0}
+.fontopt .fp b{display:block;font-size:var(--t-sm);color:var(--ink-900)}
+.fontopt .fp span{font-size:10px;color:var(--ink-400)}
+.fontopt .fs{font-size:15px;color:var(--ink-700);white-space:nowrap}
+.sizes{display:flex;gap:6px}
+.sizeopt{flex:1;padding:9px 4px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface);
+  display:grid;justify-items:center;gap:2px}
+.sizeopt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.sizeopt em{font-style:normal;color:var(--ink-900);font-weight:700}
+.sizeopt span{font-size:9.5px;color:var(--ink-400)}
+.hlgrid{display:grid;gap:7px}
+.hlrow{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.hlrow .hn{flex:1;font-size:var(--t-sm);color:var(--ink-800)}
+.dots{display:flex;gap:5px}
+.cdot{width:19px;height:19px;border-radius:5px;border:1.5px solid transparent}
+.cdot[aria-pressed="true"]{border-color:var(--ink-900);box-shadow:0 0 0 2px var(--surface) inset}
+.preset{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.preset button{padding:6px 11px;border-radius:var(--r-full);border:1px solid var(--line);background:var(--surface);
+  font-size:11.5px;font-weight:650;color:var(--ink-600)}
+.preset button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="deck-head">
+    <div>
+      <h1>Plimsoll — UI/UX 設計稿 v2 · 完整版</h1>
+      <p>在 v1 基礎上追加：RWD 手機／平板 · 字型大小與字體設定 · 比對高亮色盤 · 視覺差異（圖片快照）比對</p>
+    </div>
+    <div class="deck-ctrl">
+      <div class="tgl" id="notesToggle">
+        <button data-notes="on" aria-pressed="true">顯示設計註解</button>
+        <button data-notes="off" aria-pressed="false">只看畫面</button>
+      </div>
+      <div class="tgl" id="themeToggle">
+        <button data-theme-set="light" aria-pressed="true">淺色</button>
+        <button data-theme-set="dark" aria-pressed="false">深色</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-picker" role="tablist">
+    <button role="tab" aria-selected="true"  data-go="s1">① 空狀態 · 來源選取</button>
+    <button role="tab" aria-selected="false" data-go="s2">② 補件確認</button>
+    <button role="tab" aria-selected="false" data-go="s3">③ 比對完成</button>
+    <button role="tab" aria-selected="false" data-go="s4">④ 逐項覆核</button>
+    <button role="tab" aria-selected="false" data-go="s5">⑤ 匯出攔截</button>
+    <button role="tab" aria-selected="false" data-go="s6">⑥ 左欄排序／拖曳</button>
+    <button role="tab" aria-selected="false" data-go="s7">⑦ 雙欄收合</button>
+    <button role="tab" aria-selected="false" data-go="s8">⚙️ 設定 · 外觀／字型／高亮</button>
+    <button role="tab" aria-selected="false" data-go="s9">⚙️ 設定 · 角色／模型／來源</button>
+    <button role="tab" aria-selected="false" data-go="s11">📱 手機／平板 RWD</button>
+    <button role="tab" aria-selected="false" data-go="s12">🖼 視覺差異（圖片快照）</button>
+    <button role="tab" aria-selected="false" data-go="s10">品牌與 Tokens</button>
+  </div>
+
+<!-- ═══════════════ ① 空狀態 ═══════════════ -->
+<section class="screen is-on" id="s1">
+  <div class="note"><b>設計重點｜</b>
+    TopBar 只剩品牌、文件對、雙欄收合鈕與齒輪 —— <b>角色與主題都移進設定</b>。右欄除了丟檔，還有<b>「選擇本機資料夾」與「連結 Google 雲端資料夾」</b>兩個來源入口；右欄最下方是<b>流程節點</b>，取代原本頂部的步驟列。中欄空狀態由 agent 主動開場並給建議動作，第一眼就知道能做什麼。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" title="收合左欄"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        <button class="icon-btn" title="收合右欄"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+        <button class="icon-btn" title="設定"><span class="badge"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.18V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.18 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 3.09 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.27 7.18a2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.18 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+    </div>
+
+    <div class="shell">
+      <aside class="histrail">
+        <div class="hist-top">
+          <button class="newbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button>
+        </div>
+        <div class="hist-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="搜尋比對紀錄…"></div>
+        <div class="sortbar">
+          <select><option>最近更新</option><option>建立時間</option><option>名稱 A→Z</option><option>High 風險數</option><option>手動排序</option></select>
+          <button class="mini-btn" title="切換升冪／降冪"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3"/></svg></button>
+        </div>
+        <div class="hist-list">
+          <div class="hist-grp">今天</div>
+          <button class="hist-item" aria-current="true">
+            <span class="drag"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span>
+            <span class="bd"><span class="ti">新的比對</span><span class="mt"><span class="tag">本機</span>尚未載入文件</span></span>
+          </button>
+          <div class="hist-grp">前 7 天</div>
+          <button class="hist-item">
+            <span class="drag"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span>
+            <span class="bd"><span class="ti">主機冷卻系統維修程序</span><span class="mt"><span class="tag remote">遠端</span><span class="vv">v1.0→v1.1</span> · 25 筆</span></span>
+          </button>
+          <button class="hist-item">
+            <span class="drag"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span>
+            <span class="bd"><span class="ti">鋼船規範 第 3 篇 機械設備</span><span class="mt"><span class="tag remote">遠端</span><span class="vv">2026→2027</span> · 61 筆</span></span>
+          </button>
+          <button class="hist-item">
+            <span class="drag"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span>
+            <span class="bd"><span class="ti">發電機組保養手冊</span><span class="mt"><span class="tag">本機</span><span class="vv">v2.3→v2.4</span> · 12 筆</span></span>
+          </button>
+        </div>
+        <div class="hist-foot"><span class="avatar">陳</span><span>陳○○ · 安全品質主管</span></div>
+      </aside>
+
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">新的比對</span><span class="tag">本機</span></div>
+        <div class="thread">
+          <div class="hero">
+            <h2>把兩版技術文件交給 Plimsoll，<br>幾分鐘內拿到可追溯的差異報告</h2>
+            <p>每筆差異都附<b style="color:var(--ink-800)">舊／新版頁碼與原文段落</b>；壓力、溫度與義務詞彙變更自動標為 High 風險，最後由你簽核。</p>
+            <div class="hero-cards">
+              <div class="hcard">
+                <div class="hi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+                <b>逐項差異對照</b><span>新增／刪除／修改，每筆帶雙版頁碼與原文</span>
+              </div>
+              <div class="hcard">
+                <div class="hi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+                <b>越線即示警</b><span>數值、安全關鍵詞、義務詞彙變更判為 High</span>
+              </div>
+              <div class="hcard">
+                <div class="hi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div>
+                <b>人工覆核與簽核</b><span>逐項判定，含 Audit Trail 與報告匯出</span>
+              </div>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body">
+              <div class="bubble">
+                請在<b>右側來源區</b>放入舊版與新版 PDF —— 可以直接拖曳、從本機資料夾挑選，或連結 Google 雲端資料夾。也可以先用內建 Demo 走一遍完整流程。
+                <div class="actions">
+                  <button class="act-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>載入 6 頁合成 Demo</button>
+                  <button class="act-chip plain">從本機資料夾挑選</button>
+                  <button class="act-chip plain">Plimsoll 怎麼用？</button>
+                </div>
+              </div>
+              <div class="msg-time">剛剛</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-box">
+            <textarea placeholder="輸入問題，或先在右側放入兩份 PDF…"></textarea>
+            <div class="composer-tools">
+              <button class="tool-btn" title="附加檔案"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.05 12.25 20.2a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+              <span class="muted" style="font-size:10px">Claude 3.5 Sonnet</span>
+              <button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+            </div>
+          </div>
+          <div class="composer-hint">AI 判讀僅供草稿與警示輔助，工程與安全品質人員為最終權責決策者</div>
+        </div>
+      </div>
+
+      <aside class="siderail">
+        <div class="rail-strip">
+          <button class="rs" aria-pressed="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></button>
+          <button class="rs"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg></button>
+        </div>
+        <div class="side-tabs">
+          <button class="tab" aria-pressed="true">來源</button>
+          <button class="tab" aria-pressed="false">原文</button>
+        </div>
+        <div class="side-body">
+          <div class="srcbtns">
+            <button class="srcbtn">
+              <span class="si"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.9-1.3A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/></svg></span>
+              <span class="sm"><b>選擇本機資料夾</b><span>一次帶入整個資料夾的 PDF</span></span>
+              <span class="tag">本機</span>
+            </button>
+            <button class="srcbtn">
+              <span class="si"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 8 14M8 17h12M4 17 12 3"/></svg></span>
+              <span class="sm"><b>連結 Google 雲端資料夾</b><span>尚未連線</span></span>
+              <span class="tag drive">Drive</span>
+            </button>
+          </div>
+          <span class="slot-tag">舊版 · OLD</span>
+          <div class="dropzone">
+            <div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+            <h5>拖曳舊版 PDF</h5><p>或點擊選擇檔案</p>
+          </div>
+          <span class="slot-tag new">新版 · NEW</span>
+          <div class="dropzone">
+            <div class="di"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
+            <h5>拖曳新版 PDF</h5><p>或點擊選擇檔案</p>
+          </div>
+          <button class="btn btn-primary btn-full" disabled>開始版本差異比對</button>
+        </div>
+
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag">本機</span></div>
+          <div class="flow">
+            <div class="fnode now"><span class="fdot">1</span><span class="fmeta"><b>載入來源</b><span>等待兩份 PDF</span></span></div>
+            <div class="fnode"><span class="fdot">2</span><span class="fmeta"><b>差異比對</b><span>—</span></span></div>
+            <div class="fnode"><span class="fdot">3</span><span class="fmeta"><b>逐項覆核</b><span>—</span></span></div>
+            <div class="fnode"><span class="fdot">4</span><span class="fmeta"><b>簽核匯出</b><span>—</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ② 補件確認 ═══════════════ -->
+<section class="screen" id="s2">
+  <div class="note"><b>設計重點｜</b>
+    補回第一版被砍掉的 <b>Missing Info 路徑（R1／AC4）</b>：抓不到版本號時，agent 在對話中提出，右欄檔案卡就地補填，補齊才放行比對。掃描頁警示也在此提出。來源卡片上帶 <b>本機／Drive／遠端</b> 小標，一眼看出檔案從哪來。流程節點顯示「載入來源」卡在待補件。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.18V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.18 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 3.09 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.27 7.18a2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.18 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+    </div>
+    <div class="shell">
+      <aside class="histrail">
+        <div class="hist-top"><button class="newbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button></div>
+        <div class="hist-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="搜尋比對紀錄…"></div>
+        <div class="sortbar"><select><option>最近更新</option><option>建立時間</option><option>手動排序</option></select><button class="mini-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3"/></svg></button></div>
+        <div class="hist-list">
+          <div class="hist-grp">今天</div>
+          <button class="hist-item" aria-current="true"><span class="drag"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span><span class="bd"><span class="ti">主機冷卻系統維修程序</span><span class="mt"><span class="tag sync">未同步</span>待補版本號</span></span></button>
+          <div class="hist-grp">前 7 天</div>
+          <button class="hist-item"><span class="drag"></span><span class="bd"><span class="ti">鋼船規範 第 3 篇</span><span class="mt"><span class="tag remote">遠端</span>61 筆</span></span></button>
+        </div>
+        <div class="hist-foot"><span class="avatar">陳</span><span>陳○○ · 安全品質主管</span></div>
+      </aside>
+
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span><span class="pill med">待補件</span></div>
+        <div class="thread">
+          <div class="msg user"><div class="msg-av me">陳</div><div class="msg-body"><div class="bubble">從 Drive 的「技術手冊 / 主機」資料夾挑了兩份，幫我比對。</div><div class="msg-time">10:42</div></div></div>
+          <div class="msg">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body">
+              <div class="bubble">
+                兩份都解析成功，但有 <b>2 件事需要你先確認</b>，我不會自行猜測：
+                <div class="alert warn">
+                  <span class="a-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+                  <div><b>新版文件缺少版本號碼</b>請在右側來源卡補填，補齊後才能開始比對（差異報告需可稽核，不接受推測版本）。</div>
+                </div>
+                <div class="alert warn">
+                  <span class="a-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 15 5-5 4 4 3-3 6 6"/><circle cx="9" cy="9" r="1.5"/></svg></span>
+                  <div><b>新版 p.5 疑似掃描影像頁</b>文字層不足，該頁差異可能偵測不到。我會標為「需人工比對」而不下結論，建議先 OCR 或人工雙重校對。</div>
+                </div>
+                <div class="actions">
+                  <button class="act-chip">前往補填版本號 →</button>
+                  <button class="act-chip plain">改挑其他檔案</button>
+                </div>
+              </div>
+              <div class="msg-time">10:42</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-box"><textarea placeholder="輸入訊息…"></textarea>
+            <div class="composer-tools"><button class="tool-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.05 12.25 20.2a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button><span class="muted" style="font-size:10px">Claude 3.5 Sonnet</span><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="siderail">
+        <div class="side-tabs"><button class="tab" aria-pressed="true">來源</button><button class="tab" aria-pressed="false">原文</button></div>
+        <div class="side-body">
+          <span class="slot-tag">舊版 · OLD</span>
+          <div class="fcard">
+            <div class="row">
+              <div class="fico">PDF</div>
+              <div style="flex:1;min-width:0">
+                <div class="nm">Main_Engine_Cooling_v1.0.pdf</div>
+                <div class="mt"><span class="tag drive">Drive</span>6 頁 · 248 KB</div>
+              </div>
+              <button class="tool-btn" style="width:22px;height:22px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <dl class="fkv"><dt>版本</dt><dd class="mono">v1.0</dd><dt>日期</dt><dd class="mono">2026-03-11</dd><dt>文字層</dt><dd>完整</dd></dl>
+          </div>
+          <span class="slot-tag new">新版 · NEW</span>
+          <div class="fcard" style="border-color:var(--med-200)">
+            <div class="row">
+              <div class="fico new">PDF</div>
+              <div style="flex:1;min-width:0">
+                <div class="nm">Main_Engine_Cooling_new.pdf</div>
+                <div class="mt"><span class="tag drive">Drive</span>6 頁 · <b style="color:var(--med-700)">p.5 掃描頁</b></div>
+              </div>
+              <button class="tool-btn" style="width:22px;height:22px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <dl class="fkv"><dt>版本</dt><dd class="miss">未偵測到</dd><dt>日期</dt><dd class="mono">2026-08-01</dd><dt>文字層</dt><dd class="miss">p.5 不足</dd></dl>
+            <div class="mini-field">
+              <label>手動輸入新版版本號 <span style="color:var(--high-700)">*必填</span></label>
+              <input class="input" placeholder="例如 v1.1">
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" disabled>開始版本差異比對</button>
+          <p class="muted" style="text-align:center;margin-top:6px;font-size:10px">補齊版本號後即可開始</p>
+        </div>
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag sync">未同步</span></div>
+          <div class="flow">
+            <div class="fnode alert"><span class="fdot">!</span><span class="fmeta"><b>載入來源</b><span>1 項待補件 · 1 頁需人工</span></span></div>
+            <div class="fnode"><span class="fdot">2</span><span class="fmeta"><b>差異比對</b><span>—</span></span></div>
+            <div class="fnode"><span class="fdot">3</span><span class="fmeta"><b>逐項覆核</b><span>—</span></span></div>
+            <div class="fnode"><span class="fdot">4</span><span class="fmeta"><b>簽核匯出</b><span>—</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ③ 比對完成 ═══════════════ -->
+<section class="screen" id="s3">
+  <div class="note"><b>設計重點｜</b>
+    引導感來自 agent 敘事 + 建議動作 chips。KPI 與風險分佈之後直接列出重大變更，卡面就顯示 <code>85 °C → 80 °C</code>，不必展開。右欄流程節點同步更新：載入與比對已完成（綠），覆核為現在進行（黑），簽核尚未開放（灰）。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <span class="docpair"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span><span>·</span>Main Engine Cooling</span>
+      <div class="topbar-right">
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.18V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.18 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 3.09 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.27 7.18a2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.18 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+    </div>
+    <div class="shell">
+      <aside class="histrail">
+        <div class="hist-top"><button class="newbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button></div>
+        <div class="hist-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="搜尋比對紀錄…"></div>
+        <div class="sortbar"><select><option>最近更新</option><option>High 風險數</option></select><button class="mini-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4v16m0 0-3-3m3 3 3-3M17 20V4m0 0-3 3m3-3 3 3"/></svg></button></div>
+        <div class="hist-list">
+          <div class="hist-grp">今天</div>
+          <button class="hist-item" aria-current="true"><span class="drag"></span><span class="bd"><span class="ti">主機冷卻系統維修程序</span><span class="mt"><span class="tag sync">未同步</span>25 筆 · <b style="color:var(--high-700)">4 High</b></span></span></button>
+          <div class="hist-grp">前 7 天</div>
+          <button class="hist-item"><span class="drag"></span><span class="bd"><span class="ti">鋼船規範 第 3 篇</span><span class="mt"><span class="tag remote">遠端</span>61 筆</span></span></button>
+          <button class="hist-item"><span class="drag"></span><span class="bd"><span class="ti">發電機組保養手冊</span><span class="mt"><span class="tag">本機</span>12 筆</span></span></button>
+        </div>
+        <div class="hist-foot"><span class="avatar">陳</span><span>陳○○ · 安全品質主管</span></div>
+      </aside>
+
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span><span class="pill ink">25 筆差異</span><span class="tag sync" style="margin-left:auto">未同步</span></div>
+        <div class="thread">
+          <div class="msg">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body">
+              <div class="bubble">
+                比對完成。<b>v1.0 → v1.1</b> 共找出 <b>25 筆</b>可追溯差異，其中 <b style="color:var(--high-700)">4 筆為候選重大安全變更</b>，全部尚未人工覆核。
+                <div class="rcard">
+                  <div class="kpis">
+                    <div class="kpi"><div class="lbl">總差異</div><div class="val">25</div><div class="fine">新增 6 · 刪除 3 · 修改 16</div></div>
+                    <div class="kpi high"><div class="lbl">重大候選 High</div><div class="val">4</div><div class="fine">數值 / 義務詞彙</div></div>
+                    <div class="kpi done"><div class="lbl">已覆核</div><div class="val">0</div><div class="fine">覆核率 0%</div></div>
+                    <div class="kpi pend"><div class="lbl">待簽核 High</div><div class="val">4</div><div class="fine">阻擋正式匯出</div></div>
+                  </div>
+                  <div class="rcard-pad">
+                    <div class="bar"><i style="width:16%;background:var(--high-500)"></i><i style="width:36%;background:var(--med-500)"></i><i style="width:48%;background:var(--low-500)"></i></div>
+                    <div class="legend">
+                      <span><i class="dot" style="background:var(--high-500)"></i>High 4</span>
+                      <span><i class="dot" style="background:var(--med-500)"></i>Medium 9</span>
+                      <span><i class="dot" style="background:var(--low-500)"></i>Low 12</span>
+                      <span style="margin-left:auto;color:var(--ink-400)">主機冷卻系統 · 循環泵浦 · 溫度檢查程序</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="rcard">
+                  <div class="rcard-head"><h4>需優先處理的重大變更</h4><span class="pill high" style="margin-left:auto">4 項未覆核</span></div>
+                  <div class="diffrow">
+                    <span class="st"></span>
+                    <div class="m">
+                      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="pill high">High</span><span class="pill neutral">修改</span><span class="mono" style="font-size:10px;color:var(--ink-400)">D01</span></div>
+                      <div class="tt" style="margin-top:4px">冷卻水出口溫度上限收緊</div>
+                      <div class="deltas"><span class="delta-old">85 °C</span><span style="color:var(--ink-400)">→</span><span class="delta-new">80 °C</span><span class="muted">「建議」改為「必須」</span></div>
+                      <div class="eq">主機冷卻系統 · <span class="srcline">舊 p.4 → 新 p.4</span></div>
+                    </div>
+                  </div>
+                  <div class="diffrow">
+                    <span class="st"></span>
+                    <div class="m">
+                      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="pill high">High</span><span class="pill neutral">修改</span><span class="mono" style="font-size:10px;color:var(--ink-400)">D02</span></div>
+                      <div class="tt" style="margin-top:4px">循環泵浦檢查頻率提高</div>
+                      <div class="deltas"><span class="delta-old">每月檢查</span><span style="color:var(--ink-400)">→</span><span class="delta-new">每週檢查</span><span class="muted">保養排程需同步調整</span></div>
+                      <div class="eq">循環泵浦 · <span class="srcline">舊 p.3 → 新 p.3</span></div>
+                    </div>
+                  </div>
+                  <div class="diffrow">
+                    <span class="st"></span>
+                    <div class="m">
+                      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="pill high">High</span><span class="pill neutral">新增</span><span class="pill med">信心度低</span><span class="mono" style="font-size:10px;color:var(--ink-400)">D07</span></div>
+                      <div class="tt" style="margin-top:4px">新增啟動前壓力驗證紀錄要求</div>
+                      <div class="deltas"><span class="delta-new">新增 10 bar 驗證步驟</span><span class="muted">來源為掃描頁 — 需人工比對，不下結論</span></div>
+                      <div class="eq">冷卻液壓力監測 · <span class="srcline">新 p.5</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="act-chip">開始逐項覆核（25 筆）</button>
+                  <button class="act-chip plain">只看 4 筆 High</button>
+                  <button class="act-chip plain">同步到伺服器</button>
+                  <button class="act-chip plain">先匯出報告</button>
+                </div>
+              </div>
+              <div class="msg-time">10:44 · 耗時 8.2 秒</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="suggest"><button>D01 為什麼判成 High？</button><button>哪些設備受影響？</button></div>
+          <div class="composer-box"><textarea placeholder="輸入訊息…"></textarea>
+            <div class="composer-tools"><button class="tool-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.05 12.25 20.2a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button><span class="muted" style="font-size:10px">Claude 3.5 Sonnet</span><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="siderail">
+        <div class="side-tabs"><button class="tab" aria-pressed="true">來源</button><button class="tab" aria-pressed="false">原文</button></div>
+        <div class="side-body">
+          <span class="slot-tag">舊版 · OLD</span>
+          <div class="fcard"><div class="row"><div class="fico">PDF</div><div style="flex:1;min-width:0"><div class="nm">Main_Engine_Cooling_v1.0.pdf</div><div class="mt"><span class="tag drive">Drive</span>6 頁 · v1.0</div></div></div></div>
+          <span class="slot-tag new">新版 · NEW</span>
+          <div class="fcard"><div class="row"><div class="fico new">PDF</div><div style="flex:1;min-width:0"><div class="nm">Main_Engine_Cooling_v1.1.pdf</div><div class="mt"><span class="tag drive">Drive</span>6 頁 · v1.1</div></div></div></div>
+          <div class="todo">
+            <h5>關卡</h5>
+            <div class="check"><span class="b ok">✓</span><span>版本資訊完整</span></div>
+            <div class="check"><span class="b ok">✓</span><span>25 筆皆附雙版頁碼原文</span></div>
+            <div class="check"><span class="b no">!</span><span><b style="color:var(--high-700)">4 項 High 尚未覆核</b></span></div>
+            <div class="check"><span class="b wait">◷</span><span>新版 p.5 掃描頁需人工比對</span></div>
+          </div>
+        </div>
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag sync">未同步</span></div>
+          <div class="flow">
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>載入來源</b><span>v1.0 → v1.1 · 各 6 頁</span></span></div>
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>差異比對</b><span>25 筆 · 4 High · 8.2 秒</span></span></div>
+            <div class="fnode now"><span class="fdot">3</span><span class="fmeta"><b>逐項覆核</b><span>0 / 25 已判定</span>
+              <span class="fbar"><i style="width:0%;background:var(--low-500)"></i></span></span></div>
+            <div class="fnode"><span class="fdot">4</span><span class="fmeta"><b>簽核匯出</b><span>覆核後開放</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ④ 逐項覆核 ═══════════════ -->
+<section class="screen" id="s4">
+  <div class="note"><b>設計重點｜</b>
+    覆核直接在對話流裡完成：展開即是<b>逐字級 diff（紅刪除／綠新增）＋判定＋改判風險＋筆記</b>。點卡片內頁碼，右欄自動切到「原文」並跳頁、高亮命中句 —— 這是第一版雙欄 PDF viewer 的替代，也是「100% 可追溯」的視覺證據。右欄流程節點的覆核進度條即時前進。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <span class="docpair"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span></span>
+      <div class="topbar-right">
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+      </div>
+    </div>
+    <div class="shell lcol">
+      <aside class="histrail">
+        <div class="hist-top">
+          <button class="newbtn" title="新的比對"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button>
+          <button class="mini-btn" title="展開左欄"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+          <button class="mini-btn" title="比對紀錄"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg></button>
+        </div>
+        <div style="flex:1"></div>
+        <div class="hist-foot"><span class="avatar">王</span><span>王○○</span></div>
+      </aside>
+
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span><span class="pill high">2 High 待判</span></div>
+        <div class="thread">
+          <div class="msg user"><div class="msg-av me">王</div><div class="msg-body"><div class="bubble">開始逐項覆核，先從 High 開始。</div><div class="msg-time">11:02</div></div></div>
+          <div class="msg" style="max-width:100%">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body">
+              <div class="bubble">
+                依風險排序共 4 筆 High。這是第 1 筆 —— 可直接判定，點頁碼可在右側看原文。
+                <div class="rcard" style="border-color:var(--high-200)">
+                  <div class="diffrow" aria-current="true">
+                    <span class="st"></span>
+                    <div class="m">
+                      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                        <span class="pill high">High</span><span class="pill neutral">修改</span><span class="pill ink">信心度 高</span>
+                        <span class="mono" style="font-size:10px;color:var(--ink-400);margin-left:auto">D01 · 第 1 / 4 筆 High</span>
+                      </div>
+                      <div class="tt" style="margin-top:4px">冷卻水出口溫度上限收緊，義務詞彙由「建議」改為「必須」</div>
+                      <div class="eq">主機冷卻系統 / 溫度檢查程序 · <span class="srcline">舊 p.4 → 新 p.4</span></div>
+                    </div>
+                  </div>
+                  <div class="expand">
+                    <div class="diff-cols">
+                      <div class="diff-col">
+                        <div class="cap"><span>舊版 v1.0</span><span class="srcline">PDF p.4 · §2.1 ↗</span></div>
+                        <div class="excerpt"><span class="sec">§2.1 冷卻系統運轉限值</span>主機冷卻水出口溫度<del>建議</del>維持在 <del>85 °C</del> 以下，運轉中每 <del>4</del> 小時記錄一次讀值。</div>
+                      </div>
+                      <div class="diff-col">
+                        <div class="cap"><span>新版 v1.1</span><span class="srcline">PDF p.4 · §2.1 ↗</span></div>
+                        <div class="excerpt new"><span class="sec">§2.1 冷卻系統運轉限值</span>主機冷卻水出口溫度<ins>必須</ins>維持在 <ins>80 °C</ins> 以下，運轉中每 <ins>2</ins> 小時記錄一次讀值。</div>
+                      </div>
+                    </div>
+                    <dl class="readout">
+                      <div class="ro"><dt>變更解讀</dt><dd>數值與安全條件同時變更（上限下修 5 °C），且義務詞彙由建議性改為強制性，具極高工安風險。</dd></div>
+                      <div class="ro"><dt>觸發規則</dt><dd><span class="pill neutral">數值變更 °C</span> <span class="pill neutral">安全關鍵詞 溫度</span> <span class="pill neutral">義務詞彙 必須</span></dd></div>
+                      <div class="ro"><dt>建議處置</dt><dd class="act">停用舊版溫度檢查表，通知輪機部門並重新簽核 SOP。</dd></div>
+                    </dl>
+                    <div class="review-bar">
+                      <span class="lab">人工覆核判定 <span class="muted" style="font-weight:400">— 你的判定會覆蓋 AI 初判並寫入 Audit Trail</span></span>
+                      <div class="choices">
+                        <button class="choice ok" aria-pressed="false">✓ 已確認 <span class="kbd">A</span></button>
+                        <button class="choice track" aria-pressed="false">◷ 需追蹤 <span class="kbd">T</span></button>
+                        <button class="choice no" aria-pressed="false">✕ 不採納 <span class="kbd">D</span></button>
+                        <div style="margin-left:auto;display:flex;align-items:center;gap:7px">
+                          <span class="muted" style="font-size:10px">改判風險</span>
+                          <select class="input" style="width:auto;padding:5px 8px;font-size:11.5px"><option>High（AI 初判）</option><option>Medium</option><option>Low</option></select>
+                        </div>
+                      </div>
+                      <input class="input" style="margin-top:8px" placeholder="覆核理由 / 審核筆記（寫入審查報告與 Audit Trail）">
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px">
+                        <span class="muted" style="font-size:10px"><span class="kbd">J</span><span class="kbd">K</span> 上下筆 · <span class="kbd">Enter</span> 確認並跳下一筆</span>
+                        <button class="btn btn-primary btn-sm">確認並前往下一筆 →</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="msg-time">11:02</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="suggest"><button>這條變更會影響哪些檢查表？</button><button>舊版還有哪裡提到 85 °C？</button></div>
+          <div class="composer-box"><textarea placeholder="針對 D01 提問…"></textarea>
+            <div class="composer-tools"><button class="tool-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.4 11.05 12.25 20.2a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button><span class="pill ink" style="font-size:10px">已引用 D01</span><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="siderail">
+        <div class="side-tabs"><button class="tab" aria-pressed="false">來源</button><button class="tab" aria-pressed="true">原文</button></div>
+        <div class="side-body">
+          <div class="pdf-switch"><button aria-pressed="true">文字重建</button><button aria-pressed="false">原始 PDF</button></div>
+          <div class="pdf-switch"><button aria-pressed="false">舊版 p.4</button><button aria-pressed="true">新版 p.4</button><button aria-pressed="false">並排</button></div>
+          <div class="page-shot">
+            <div class="pg-h"><span>Main Engine Cooling Procedure</span><span>v1.1 · p.4</span></div>
+            <h5>2. 運轉限值與檢查</h5>
+            <p style="margin-bottom:6px">2.1 冷卻系統運轉限值</p>
+            <p style="margin-bottom:6px">主機冷卻水出口溫度<mark class="hit">必須維持在 80 °C 以下</mark>，運轉中每 <mark class="hit">2</mark> 小時記錄一次讀值並簽章。</p>
+            <p style="margin-bottom:6px">2.2 若出口溫度連續兩次超過限值，應立即降載並通知輪機長。</p>
+            <h5>3. 泵浦檢查</h5>
+            <p>3.1 循環泵浦<mark>每週</mark>檢查一次軸封洩漏情形。</p>
+          </div>
+          <div class="pdf-nav"><button class="btn btn-ghost btn-sm">← 上頁</button><span>4 / 6 · 命中 2 處</span><button class="btn btn-ghost btn-sm">下頁 →</button></div>
+        </div>
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag remote">遠端</span></div>
+          <div class="flow">
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>載入來源</b><span>v1.0 → v1.1</span></span></div>
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>差異比對</b><span>25 筆 · 4 High</span></span></div>
+            <div class="fnode now"><span class="fdot">3</span><span class="fmeta"><b>逐項覆核</b><span>18 / 25 已判定 · 2 High 待判</span>
+              <span class="fbar"><i style="width:72%;background:var(--low-500)"></i><i style="width:8%;background:var(--high-500)"></i></span></span></div>
+            <div class="fnode"><span class="fdot">4</span><span class="fmeta"><b>簽核匯出</b><span>覆核後開放</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑤ 匯出攔截 ═══════════════ -->
+<section class="screen" id="s5">
+  <div class="note"><b>設計重點｜</b>
+    對應驗收情境四「Human Control」：未覆核的 High 在點匯出時<b>必跳二次確認並逐項列出</b>。流程節點的第 4 站標成紅色警示，一眼看出卡在哪。HTML 報告也回來了（現行 React 版那顆按鈕打的 <code>/api/export-html</code> 後端根本不存在，按了就 404）。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <span class="docpair"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span></span>
+      <div class="topbar-right"><button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    </div>
+    <div class="shell">
+      <aside class="histrail">
+        <div class="hist-top"><button class="newbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button></div>
+        <div class="hist-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="搜尋…"></div>
+        <div class="hist-list"><div class="hist-grp">今天</div><button class="hist-item" aria-current="true"><span class="drag"></span><span class="bd"><span class="ti">主機冷卻系統維修程序</span><span class="mt"><span class="tag remote">遠端</span>22 / 25</span></span></button></div>
+        <div class="hist-foot"><span class="avatar">陳</span><span>陳○○ · 安全品質主管</span></div>
+      </aside>
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span><span class="tag remote">遠端</span></div>
+        <div class="thread">
+          <div class="msg user"><div class="msg-av me">陳</div><div class="msg-body"><div class="bubble">幫我匯出審查報告。</div><div class="msg-time">11:35</div></div></div>
+          <div class="msg">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body">
+              <div class="bubble">
+                匯出前先確認狀態：
+                <div class="alert danger">
+                  <span class="a-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+                  <div><b>仍有 2 項 High 未覆核（D01、D07）</b>若現在匯出，報告會標註為「修訂草稿」並在封面加註警示。</div>
+                </div>
+                <div class="rcard">
+                  <div class="rcard-head"><h4>審查與簽核資訊</h4><span class="sub">寫入報告表頭與簽名欄</span></div>
+                  <div class="rcard-pad" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div><label style="font-size:10px;font-weight:700;color:var(--ink-600);display:block;margin-bottom:3px">審查人 / 職稱</label><input class="input" value="陳○○ · 安全品質主管"></div>
+                    <div><label style="font-size:10px;font-weight:700;color:var(--ink-600);display:block;margin-bottom:3px">審查日期</label><input class="input" value="2026-08-15"></div>
+                    <div><label style="font-size:10px;font-weight:700;color:var(--ink-600);display:block;margin-bottom:3px">審查單位</label><input class="input" value="技術管理部"></div>
+                    <div><label style="font-size:10px;font-weight:700;color:var(--ink-600);display:block;margin-bottom:3px">報告編號</label><input class="input mono" value="SDR-20260815-001"></div>
+                  </div>
+                </div>
+                <div class="actions"><button class="act-chip">先去覆核那 2 項</button><button class="act-chip plain">仍要匯出</button></div>
+              </div>
+              <div class="msg-time">11:35</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer"><div class="composer-box"><textarea placeholder="輸入訊息…"></textarea>
+          <div class="composer-tools"><span class="muted" style="font-size:10px;margin-left:4px">Claude 3.5 Sonnet</span><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></div></div>
+      </div>
+      <aside class="siderail">
+        <div class="side-tabs"><button class="tab" aria-pressed="true">來源</button><button class="tab" aria-pressed="false">原文</button></div>
+        <div class="side-body">
+          <div style="font-size:10px;font-weight:700;color:var(--ink-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">匯出格式</div>
+          <div class="exp-item"><div class="exp-ico">DOCX</div><div class="m"><b>Word 審查報告</b><span>公司範本 · 簽名欄 · 完整明細</span></div><button class="btn btn-primary btn-sm">下載</button></div>
+          <div class="exp-item"><div class="exp-ico">HTML</div><div class="m"><b>獨立 HTML 報告</b><span>單檔離線可開 · 可列印</span></div><button class="btn btn-ghost btn-sm">下載</button></div>
+          <div class="exp-item"><div class="exp-ico">PDF</div><div class="m"><b>PDF 簽核版</b><span>含未覆核警示浮水印</span></div><button class="btn btn-ghost btn-sm">下載</button></div>
+          <div class="todo"><h5>匯出前檢核</h5>
+            <div class="check"><span class="b ok">✓</span><span>版本資訊完整 v1.0 / v1.1</span></div>
+            <div class="check"><span class="b ok">✓</span><span>25 筆皆附雙版頁碼與原文</span></div>
+            <div class="check"><span class="b no">!</span><span><b style="color:var(--high-700)">2 項 High 未覆核</b></span></div>
+            <div class="check"><span class="b wait">◷</span><span>新版 p.5 掃描頁需人工比對</span></div>
+          </div>
+        </div>
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag remote">遠端</span></div>
+          <div class="flow">
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>載入來源</b><span>v1.0 → v1.1</span></span></div>
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>差異比對</b><span>25 筆 · 4 High</span></span></div>
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>逐項覆核</b><span>22 / 25 已判定</span>
+              <span class="fbar"><i style="width:88%;background:var(--low-500)"></i><i style="width:8%;background:var(--high-500)"></i></span></span></div>
+            <div class="fnode alert"><span class="fdot">!</span><span class="fmeta"><b>簽核匯出</b><span>2 項 High 未覆核，將標為修訂草稿</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <div class="scrim"></div>
+    <div class="modal-wrap">
+      <div class="modal">
+        <div class="modal-top">
+          <div class="modal-ico"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+          <div><h3>仍有重大安全變更未完成人工覆核</h3><p>下列 2 項 High 風險變更尚未判定。若繼續匯出，報告會標註為「修訂草稿」並在封面加註警示。</p></div>
+        </div>
+        <ul class="modal-list">
+          <li><span class="mono" style="font-weight:700">D01</span><span>冷卻水出口溫度 85 °C → 80 °C（主機冷卻系統）</span></li>
+          <li><span class="mono" style="font-weight:700">D07</span><span>新增啟動前壓力驗證紀錄（來源為掃描頁，信心度低）</span></li>
+        </ul>
+        <div class="modal-foot"><button class="btn btn-ghost">先去覆核這 2 項</button><button class="btn btn-danger">仍要匯出為修訂草稿</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑥ 排序／拖曳 ═══════════════ -->
+<section class="screen" id="s6">
+  <div class="note"><b>設計重點｜</b>
+    左欄支援<b>兩種排序</b>：下拉選單按條件排序（最近更新／建立時間／名稱／High 風險數，右邊小鈕切換升降冪），或選「手動排序」後<b>用左側握把拖曳</b>調整順序。拖曳時顯示插入位置指示線。每列都有 <b>本機／遠端／未同步</b> 小標。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <div class="topbar-right"><button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    </div>
+    <div class="shell" style="height:470px">
+      <aside class="histrail">
+        <div class="hist-top"><button class="newbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button></div>
+        <div class="hist-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="搜尋比對紀錄…"></div>
+        <div class="sortbar">
+          <select><option selected>手動排序</option><option>最近更新</option><option>建立時間</option><option>名稱 A→Z</option><option>High 風險數</option></select>
+          <button class="mini-btn" aria-pressed="true" title="手動排序中"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
+        </div>
+        <div class="hist-list">
+          <button class="hist-item"><span class="drag" style="opacity:1"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span><span class="bd"><span class="ti">主機冷卻系統維修程序</span><span class="mt"><span class="tag remote">遠端</span>25 筆 · <b style="color:var(--high-700)">4 High</b></span></span></button>
+          <div class="hist-item dragging"><span class="drag" style="opacity:1;cursor:grabbing"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span><span class="bd"><span class="ti">發電機組保養手冊</span><span class="mt"><span class="tag">本機</span><span class="vv">v2.3→v2.4</span> · 12 筆</span></span></div>
+          <div class="drop-line"></div>
+          <button class="hist-item"><span class="drag" style="opacity:1"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span><span class="bd"><span class="ti">鋼船規範 第 3 篇 機械設備</span><span class="mt"><span class="tag remote">遠端</span>61 筆</span></span></button>
+          <button class="hist-item"><span class="drag" style="opacity:1"><svg width="10" height="14" viewBox="0 0 10 16" fill="currentColor"><circle cx="2" cy="3" r="1.2"/><circle cx="8" cy="3" r="1.2"/><circle cx="2" cy="8" r="1.2"/><circle cx="8" cy="8" r="1.2"/><circle cx="2" cy="13" r="1.2"/><circle cx="8" cy="13" r="1.2"/></svg></span><span class="bd"><span class="ti">壓載水處理系統手冊</span><span class="mt"><span class="tag sync">未同步</span>8 筆</span></span></button>
+        </div>
+        <div class="hist-foot"><span class="avatar">陳</span><span>陳○○ · 安全品質主管</span></div>
+      </aside>
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span></div>
+        <div class="thread">
+          <div class="msg"><div class="msg-av bot">P</div><div class="msg-body"><div class="bubble">
+            排序方式會記在你的偏好設定裡。<b>手動排序</b>只影響左欄顯示順序，不會動到資料本身。
+            <div class="alert info" style="margin-top:10px"><span class="a-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+            <div><b>小標說明</b>
+              <span class="tag">本機</span> 只存在這台瀏覽器　·
+              <span class="tag remote">遠端</span> 已寫入伺服器、可跨裝置　·
+              <span class="tag sync">未同步</span> 有本機變更尚未上傳
+            </div></div>
+          </div></div></div>
+        </div>
+        <div class="composer"><div class="composer-box"><textarea placeholder="輸入訊息…"></textarea><div class="composer-tools"><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></div></div>
+      </div>
+      <aside class="siderail">
+        <div class="side-tabs"><button class="tab" aria-pressed="true">來源</button><button class="tab" aria-pressed="false">原文</button></div>
+        <div class="side-body"><p class="muted">選取比對後顯示來源檔案。</p></div>
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag remote">遠端</span></div>
+          <div class="flow">
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>載入來源</b><span>v1.0 → v1.1</span></span></div>
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>差異比對</b><span>25 筆</span></span></div>
+            <div class="fnode now"><span class="fdot">3</span><span class="fmeta"><b>逐項覆核</b><span>18 / 25</span></span></div>
+            <div class="fnode"><span class="fdot">4</span><span class="fmeta"><b>簽核匯出</b><span>—</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑦ 雙欄收合 ═══════════════ -->
+<section class="screen" id="s7">
+  <div class="note"><b>設計重點｜</b>
+    左右欄都能獨立收合。<b>右欄收成 46px 後仍保留流程節點的小圓點</b>（綠＝完成、黑＝進行中、紅＝警示），不必展開就知道進度。中欄變寬後，雙欄原文對照更好讀。收合狀態記在 <code>localStorage</code>。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <span class="docpair"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span></span>
+      <div class="topbar-right">
+        <button class="icon-btn on"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        <button class="icon-btn on"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+      </div>
+    </div>
+    <div class="shell lcol rcol" style="height:492px">
+      <aside class="histrail">
+        <div class="hist-top">
+          <button class="newbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button>
+          <button class="mini-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+          <button class="mini-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg></button>
+        </div>
+        <div style="flex:1"></div>
+        <div class="hist-foot"><span class="avatar">王</span><span>王○○</span></div>
+      </aside>
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span><span class="pill high">2 High 待判</span></div>
+        <div class="thread">
+          <div class="msg" style="max-width:100%">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body"><div class="bubble">
+              兩欄都收起後，雙欄原文對照可以用到最寬的版面：
+              <div class="rcard">
+                <div class="diff-cols">
+                  <div class="diff-col">
+                    <div class="cap"><span>舊版 v1.0</span><span class="srcline">PDF p.3 · §3.1 ↗</span></div>
+                    <div class="excerpt"><span class="sec">§3.1 循環泵浦檢查</span>循環泵浦應<del>每月</del>檢查一次軸封洩漏情形，並記錄於保養表 <del>QP-05</del>；發現滲漏時<del>建議</del>安排下次靠港更換。</div>
+                  </div>
+                  <div class="diff-col">
+                    <div class="cap"><span>新版 v1.1</span><span class="srcline">PDF p.3 · §3.1 ↗</span></div>
+                    <div class="excerpt new"><span class="sec">§3.1 循環泵浦檢查</span>循環泵浦應<ins>每週</ins>檢查一次軸封洩漏情形，並記錄於保養表 <ins>QP-07</ins>；發現滲漏時<ins>必須</ins>立即停機更換。</div>
+                  </div>
+                </div>
+                <div class="review-bar">
+                  <span class="lab">人工覆核判定</span>
+                  <div class="choices">
+                    <button class="choice ok" aria-pressed="true">✓ 已確認 <span class="kbd">A</span></button>
+                    <button class="choice track" aria-pressed="false">◷ 需追蹤 <span class="kbd">T</span></button>
+                    <button class="choice no" aria-pressed="false">✕ 不採納 <span class="kbd">D</span></button>
+                  </div>
+                  <input class="input" style="margin-top:8px" value="已同步更新每週保養排程表 QP-07">
+                </div>
+              </div>
+            </div><div class="msg-time">11:08</div></div>
+          </div>
+        </div>
+        <div class="composer"><div class="composer-box"><textarea placeholder="輸入訊息…"></textarea><div class="composer-tools"><span class="muted" style="font-size:10px;margin-left:4px">Claude 3.5 Sonnet</span><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></div></div>
+      </div>
+      <aside class="siderail">
+        <div class="rail-strip">
+          <button class="rs"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></button>
+          <button class="rs" aria-pressed="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg></button>
+        </div>
+        <div style="flex:1"></div>
+        <div class="flowwrap" style="padding:12px 0 13px">
+          <div class="flow" style="align-items:center;justify-items:center">
+            <div class="fnode done" style="padding-bottom:14px"><span class="fdot" style="width:13px;height:13px">✓</span></div>
+            <div class="fnode done" style="padding-bottom:14px"><span class="fdot" style="width:13px;height:13px">✓</span></div>
+            <div class="fnode now" style="padding-bottom:14px"><span class="fdot" style="width:13px;height:13px">3</span></div>
+            <div class="fnode alert"><span class="fdot" style="width:13px;height:13px">!</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑧ 設定：一般／外觀／背景 ═══════════════ -->
+<section class="screen" id="s8">
+  <div class="note"><b>設計重點｜</b>
+    語言、外觀（淺／深／跟隨系統）與<b>自訂背景</b>都收在齒輪裡。背景可選預設、純色、漸層或上傳圖片，並可調整模糊與明暗遮罩 —— 背景只影響畫布層，卡片與文字對比不受影響。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <span class="docpair"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span></span>
+      <div class="topbar-right">
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+        <button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+        <button class="icon-btn on"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.18V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.18 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 3.09 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.27 7.18a2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.18 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+    </div>
+    <div class="shell" style="height:600px;filter:blur(1.4px);opacity:.45">
+      <aside class="histrail"><div class="hist-top"><button class="newbtn"><span>新的比對</span></button></div></aside>
+      <div class="thread-col"><div class="thread-head"><span class="tt">主機冷卻系統維修程序</span></div><div class="thread"></div></div>
+      <aside class="siderail"><div class="side-tabs"><button class="tab" aria-pressed="true">來源</button><button class="tab">原文</button></div></aside>
+    </div>
+    <div class="pop">
+      <div class="pop-head">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-900)"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 2 2 0 1 1-2.83 2.83 1.65 1.65 0 0 0-2.82 1.18V21a2 2 0 1 1-4 0 1.65 1.65 0 0 0-2.82-1.18 2 2 0 1 1-2.83-2.83A1.65 1.65 0 0 0 3.09 14H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.27 7.18a2 2 0 1 1 2.83-2.83A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 2.82 1.18 2 2 0 1 1 2.83 2.83A1.65 1.65 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <h4>設定</h4>
+        <button class="tool-btn" style="margin-left:auto;width:25px;height:25px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="pop-nav">
+        <button aria-pressed="true">一般</button><button>角色</button><button>AI 模型</button><button>資料來源</button><button>更多視圖</button>
+      </div>
+      <div class="pop-scroll">
+        <div class="pop-sec">
+          <div class="pop-lab">介面語言</div>
+          <div class="seg"><button aria-pressed="true">繁體中文</button><button aria-pressed="false">English</button></div>
+        </div>
+        <div class="pop-sec">
+          <div class="pop-lab">外觀</div>
+          <div class="seg"><button aria-pressed="true">淺色</button><button aria-pressed="false">深色</button><button aria-pressed="false">跟隨系統</button></div>
+        </div>
+
+        <div class="pop-sec">
+          <div class="pop-lab">字型大小</div>
+          <div class="sizes">
+            <button class="sizeopt"><em style="font-size:12px">Aa</em><span>小 · 12.5</span></button>
+            <button class="sizeopt" aria-pressed="true"><em style="font-size:14px">Aa</em><span>標準 · 13.5</span></button>
+            <button class="sizeopt"><em style="font-size:16px">Aa</em><span>大 · 15</span></button>
+            <button class="sizeopt"><em style="font-size:19px">Aa</em><span>特大 · 17</span></button>
+          </div>
+          <p class="muted" style="font-size:10px;margin-top:7px">整組字階等比縮放，版面與行高同步調整，不會擠版。</p>
+        </div>
+
+        <div class="pop-sec">
+          <div class="pop-lab">介面字體</div>
+          <div class="fontrow">
+            <button class="fontopt" aria-pressed="true">
+              <span class="fp"><b>Inter + Noto Sans TC</b><span>預設 · OFL 開源 · 中英混排最穩</span></span>
+              <span class="fs" style="font-family:Inter,'Noto Sans TC',sans-serif">冷卻 Ag</span>
+            </button>
+            <button class="fontopt">
+              <span class="fp"><b>IBM Plex Sans TC</b><span>OFL · 工程感、數字辨識度高</span></span>
+              <span class="fs" style="font-family:'IBM Plex Sans TC','Noto Sans TC',sans-serif">冷卻 Ag</span>
+            </button>
+            <button class="fontopt">
+              <span class="fp"><b>思源黑體 Source Han Sans</b><span>OFL · 繁中字重最完整</span></span>
+              <span class="fs" style="font-family:'Source Han Sans TC','Noto Sans TC',sans-serif">冷卻 Ag</span>
+            </button>
+            <button class="fontopt">
+              <span class="fp"><b>系統預設</b><span>不載入網路字型 · 離線最快</span></span>
+              <span class="fs" style="font-family:system-ui,sans-serif">冷卻 Ag</span>
+            </button>
+          </div>
+          <div class="pop-lab" style="margin-top:12px">原文段落字體</div>
+          <div class="fontrow">
+            <button class="fontopt" aria-pressed="true">
+              <span class="fp"><b>Noto Sans TC</b><span>與介面一致</span></span>
+              <span class="fs" style="font-family:'Noto Sans TC',sans-serif">80 °C</span>
+            </button>
+            <button class="fontopt">
+              <span class="fp"><b>Noto Serif TC</b><span>OFL 襯線 · 長段條文最好讀</span></span>
+              <span class="fs" style="font-family:'Noto Serif TC',serif">80 °C</span>
+            </button>
+            <button class="fontopt">
+              <span class="fp"><b>IBM Plex Mono</b><span>OFL 等寬 · 數值與料號逐字對齊</span></span>
+              <span class="fs" style="font-family:'IBM Plex Mono',ui-monospace,monospace">80 °C</span>
+            </button>
+          </div>
+          <p class="muted" style="font-size:10px;margin-top:7px">全部為 OFL 開源可商用字型，自架託管、不打外部 CDN。</p>
+        </div>
+
+        <div class="pop-sec">
+          <div class="pop-lab">比對高亮顏色</div>
+          <div class="preset">
+            <button aria-pressed="true">經典</button>
+            <button>色盲friendly</button>
+            <button>單色（無彩）</button>
+            <button>自訂</button>
+          </div>
+          <div class="hlgrid">
+            <div class="hlrow">
+              <span class="vswatch add"></span><span class="hn">新增 / 新版內容</span>
+              <span class="dots">
+                <button class="cdot" aria-pressed="true" style="background:#248A5F"></button>
+                <button class="cdot" style="background:#1F6FEB"></button>
+                <button class="cdot" style="background:#7C3AED"></button>
+                <button class="cdot" style="background:#0E7490"></button>
+              </span>
+            </div>
+            <div class="hlrow">
+              <span class="vswatch del"></span><span class="hn">刪除 / 舊版內容</span>
+              <span class="dots">
+                <button class="cdot" aria-pressed="true" style="background:#CE3A31"></button>
+                <button class="cdot" style="background:#D97706"></button>
+                <button class="cdot" style="background:#BE185D"></button>
+                <button class="cdot" style="background:#57534E"></button>
+              </span>
+            </div>
+            <div class="hlrow">
+              <span class="vswatch" style="border-color:#C07C1A;background:#F3E6C4"></span><span class="hn">搜尋命中</span>
+              <span class="dots">
+                <button class="cdot" aria-pressed="true" style="background:#F3E6C4"></button>
+                <button class="cdot" style="background:#CFE3F7"></button>
+                <button class="cdot" style="background:#E4DAF7"></button>
+                <button class="cdot" style="background:#E3E3E3"></button>
+              </span>
+            </div>
+          </div>
+          <div class="alert warn" style="margin-top:9px">
+            <span class="a-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+            <div><b>風險分級色（High／Medium／Low）跟著同一組色盤走</b>選「單色（無彩）」時，風險改用<b>粗細 + 圖示 + 左邊界</b>區分，仍符合「重大變更須明顯標示」的命題要求。系統會即時檢查對比度並擋掉不合格的組合。</div>
+          </div>
+        </div>
+
+        <div class="pop-sec">
+          <div class="pop-lab">自訂背景</div>
+          <div class="bgrid">
+            <button class="bswatch" aria-pressed="true" style="background:var(--canvas)"><span class="lbl">預設</span></button>
+            <button class="bswatch" style="background:#EAEAEA"><span class="lbl">純色</span></button>
+            <button class="bswatch" style="background:linear-gradient(135deg,#F2F2F2,#DCDCDC)"><span class="lbl">漸層</span></button>
+            <button class="bswatch" style="background:repeating-linear-gradient(45deg,#F3F3F3 0 6px,#ECECEC 6px 12px)"><span class="lbl">紋理</span></button>
+            <button class="bswatch" style="background:var(--surface-2);display:grid;place-items:center">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-500)" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">上傳</span>
+            </button>
+          </div>
+          <div class="slider"><span style="width:44px">模糊</span><input type="range" value="0"><span class="mono">0px</span></div>
+          <div class="slider"><span style="width:44px">遮罩</span><input type="range" value="30"><span class="mono">30%</span></div>
+          <p class="muted" style="font-size:10px;margin-top:8px">背景只套用在畫布層；卡片、文字與風險色不受影響，確保對比度符合可及性要求。</p>
+        </div>
+        <div class="pop-sec">
+          <div class="pop-lab">預設儲存位置</div>
+          <div class="seg"><button aria-pressed="true"><span class="tag">本機</span>僅本機</button><button aria-pressed="false"><span class="tag remote">遠端</span>自動同步</button></div>
+          <p class="muted" style="font-size:10px;margin-top:7px">選「僅本機」時，比對紀錄只存在這台瀏覽器，換裝置或清除資料會消失。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑨ 設定：角色／模型／來源 ═══════════════ -->
+<section class="screen" id="s9">
+  <div class="note"><b>設計重點｜</b>
+    <b>角色從 TopBar 移進設定</b>（兩個角色功能集合完全相同，只影響預設落點與排序權重）。<b>API Token 沒忘</b>：在「AI 模型」分頁，含第一版那個「已啟用 LLM／改用本機規則引擎」狀態燈，以及工作包規定的推論參數。「資料來源」分頁管理本機資料夾與 Google 雲端連線。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <div class="topbar-right"><button class="icon-btn on"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    </div>
+    <div class="shell" style="height:640px;filter:blur(1.4px);opacity:.45">
+      <aside class="histrail"><div class="hist-top"><button class="newbtn"><span>新的比對</span></button></div></aside>
+      <div class="thread-col"><div class="thread-head"><span class="tt">主機冷卻系統維修程序</span></div><div class="thread"></div></div>
+      <aside class="siderail"><div class="side-tabs"><button class="tab" aria-pressed="true">來源</button><button class="tab">原文</button></div></aside>
+    </div>
+    <div class="pop" style="max-height:648px">
+      <div class="pop-head">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--ink-900)"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+        <h4>設定</h4>
+        <button class="tool-btn" style="margin-left:auto;width:25px;height:25px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="pop-nav"><button>一般</button><button aria-pressed="true">角色</button><button>AI 模型</button><button>資料來源</button><button>更多視圖</button></div>
+      <div class="pop-scroll">
+        <div class="pop-sec">
+          <div class="pop-lab">我的角色</div>
+          <button class="rolecard" aria-pressed="true">
+            <span class="ri"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <span><b>安全品質主管</b><span>進站落在總覽與未覆核 High 摘要；差異依「風險 × 未覆核」排序；顯示簽核欄位。</span></span>
+          </button>
+          <button class="rolecard" aria-pressed="false">
+            <span class="ri"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0 5 5l-9.4 9.4a2.1 2.1 0 0 1-3-3z"/></svg></span>
+            <span><b>維修工程師</b><span>進站直接進逐項覆核；差異依文件頁序排列；右欄預設開「原文」。</span></span>
+          </button>
+          <p class="muted" style="font-size:10px;margin-top:6px">兩個角色的<b>功能集合完全相同</b>，只影響預設落點與排序權重，不會隱藏任何能力。</p>
+        </div>
+        <div class="pop-sec">
+          <div class="pop-lab">AI 模型</div>
+          <select class="input">
+            <option>AWS Bedrock — Claude 3.5 Sonnet</option>
+            <option>OpenAI — GPT-4o</option>
+            <option>Google — Gemini 1.5 Flash</option>
+            <option>Groq — Llama 3.1</option>
+            <option>不使用 LLM（本機規則引擎）</option>
+          </select>
+          <div class="pop-lab" style="margin-top:12px">API Key / Token</div>
+          <div class="keyrow">
+            <input class="input mono" type="password" value="sk-ant-••••••••••••••••" placeholder="貼上 API Key">
+            <button class="btn btn-ghost btn-sm">套用</button>
+          </div>
+          <div class="status-line"><i class="dot ok"></i><span>已啟用 <b>Claude 3.5 Sonnet</b> LLM 模式</span></div>
+          <p class="muted" style="font-size:10px;margin-top:6px">未輸入 Key 時自動改用本機精準規則引擎，比對與問答仍可完整運作。Key 僅存在瀏覽器工作階段，不寫入原始碼或版控。</p>
+          <div class="pop-lab" style="margin-top:12px">推論參數（依工作包 S1000D 事實對齊規範）</div>
+          <div class="param"><span>Temperature</span><b>0.5</b></div>
+          <div class="param"><span>Top P</span><b>0.95</b></div>
+          <div class="param"><span>Top K</span><b>40</b></div>
+          <div class="param"><span>Repeat Penalty</span><b>1.1</b></div>
+        </div>
+        <div class="pop-sec">
+          <div class="pop-lab">資料來源</div>
+          <div class="srcconn">
+            <span class="si"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.9-1.3A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/></svg></span>
+            <span class="sm"><b>本機資料夾</b><span>~/Documents/船舶技術手冊</span></span>
+            <span class="tag">本機</span>
+            <button class="btn btn-ghost btn-sm">更換</button>
+          </div>
+          <div class="srcconn">
+            <span class="si"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 8 14M8 17h12M4 17 12 3"/></svg></span>
+            <span class="sm"><b>Google 雲端硬碟</b><span>caspertseng@pocket.tw · 技術手冊 / 主機</span></span>
+            <span class="tag drive">Drive</span>
+            <button class="btn btn-ghost btn-sm">中斷</button>
+          </div>
+          <p class="muted" style="font-size:10px;margin-top:6px">Plimsoll 只讀取你指定資料夾內的 PDF，不會掃描其他位置；Drive 使用唯讀權限。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑩ 品牌與 Tokens ═══════════════ -->
+<section class="screen" id="s10">
+  <div class="note"><b>設計重點｜</b>
+    Plimsoll line（載重線）是船身上的法定安全界限標記 —— 圓中一橫、兩側刻度。這個記號本身就是極簡幾何、天生黑白，直接當 logo；圓中橫線也是「版本分界線」的隱喻。配色為純中性灰階、零色偏，唯一彩色是風險語意色。
+  </div>
+  <div class="frame">
+    <div class="tokpad">
+      <div>
+        <h2 style="font-size:var(--t-lg);color:var(--ink-900);margin-bottom:12px">品牌標記</h2>
+        <div class="logo-row">
+          <div class="logo-box">
+            <svg width="48" height="48" viewBox="0 0 32 32" fill="none" stroke="var(--ink-900)" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+            <span class="lname">Plimsoll</span>
+          </div>
+          <div class="logo-box inv">
+            <svg width="48" height="48" viewBox="0 0 32 32" fill="none" stroke="var(--surface)" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+            <span class="lname">Plimsoll</span>
+          </div>
+          <div style="flex:1;min-width:240px;font-size:var(--t-sm);color:var(--ink-600);line-height:1.8">
+            <b style="color:var(--ink-900)">Plimsoll ｜ 載重線</b><br>
+            船身上那條法定標記：船可以裝多重、吃水到哪裡，越過就違法、就危險。<br>
+            本產品做的正是同一件事 —— <b style="color:var(--ink-900)">標出技術文件裡安全界限的變更</b>，越線就示警。<br>
+            <span class="muted">全稱：Plimsoll — 船舶技術文件版本差異 Agent</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h2 style="font-size:var(--t-lg);color:var(--ink-900);margin-bottom:12px">中性階（淺色）</h2>
+        <div class="swatches">
+          <div class="sw"><div class="chipc" style="background:#000000"></div><div class="cap"><b>ink-900</b><code>#000000</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#171717"></div><div class="cap"><b>accent</b><code>#171717</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#333333"></div><div class="cap"><b>ink-700</b><code>#333333</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#575757"></div><div class="cap"><b>ink-600</b><code>#575757</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#818181"></div><div class="cap"><b>ink-500</b><code>#818181</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#A5A5A5"></div><div class="cap"><b>ink-400</b><code>#A5A5A5</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#E3E3E3"></div><div class="cap"><b>line</b><code>#E3E3E3</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#F1F1F1"></div><div class="cap"><b>accent-soft</b><code>#F1F1F1</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#F5F5F5"></div><div class="cap"><b>canvas</b><code>#F5F5F5</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#FFFFFF;border-bottom:1px solid #E3E3E3"></div><div class="cap"><b>surface</b><code>#FFFFFF</code></div></div>
+        </div>
+      </div>
+      <div>
+        <h2 style="font-size:var(--t-lg);color:var(--ink-900);margin-bottom:12px">中性階（深色）</h2>
+        <div class="swatches">
+          <div class="sw"><div class="chipc" style="background:#141414"></div><div class="cap"><b>canvas</b><code>#141414</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#171717"></div><div class="cap"><b>rail</b><code>#171717</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#1B1B1B"></div><div class="cap"><b>surface</b><code>#1B1B1B</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#282828"></div><div class="cap"><b>accent-soft</b><code>#282828</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#2E2E2E"></div><div class="cap"><b>line</b><code>#2E2E2E</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#EDEDED"></div><div class="cap"><b>ink-800</b><code>#EDEDED</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#FFFFFF;border-bottom:1px solid #E3E3E3"></div><div class="cap"><b>accent</b><code>#FFFFFF</code></div></div>
+        </div>
+      </div>
+      <div>
+        <h2 style="font-size:var(--t-lg);color:var(--ink-900);margin-bottom:12px">風險語意色（全站唯一彩色）</h2>
+        <div class="swatches">
+          <div class="sw"><div class="chipc" style="background:#B3241B"></div><div class="cap"><b>high-700</b><code>#B3241B</code> 淺</div></div>
+          <div class="sw"><div class="chipc" style="background:#CE3A31"></div><div class="cap"><b>high-500</b><code>#CE3A31</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#F0837A"></div><div class="cap"><b>high-700</b><code>#F0837A</code> 深</div></div>
+          <div class="sw"><div class="chipc" style="background:#8E540C"></div><div class="cap"><b>med-700</b><code>#8E540C</code> 淺</div></div>
+          <div class="sw"><div class="chipc" style="background:#C07C1A"></div><div class="cap"><b>med-500</b><code>#C07C1A</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#E3AE5E"></div><div class="cap"><b>med-700</b><code>#E3AE5E</code> 深</div></div>
+          <div class="sw"><div class="chipc" style="background:#14603F"></div><div class="cap"><b>low-700</b><code>#14603F</code> 淺</div></div>
+          <div class="sw"><div class="chipc" style="background:#248A5F"></div><div class="cap"><b>low-500</b><code>#248A5F</code></div></div>
+          <div class="sw"><div class="chipc" style="background:#63C79B"></div><div class="cap"><b>low-700</b><code>#63C79B</code> 深</div></div>
+        </div>
+      </div>
+      <div>
+        <h2 style="font-size:var(--t-lg);color:var(--ink-900);margin-bottom:12px">字階與元件</h2>
+        <div class="typerow"><code>--t-display 28/750</code><span style="font-size:28px;font-weight:750;letter-spacing:-.025em;color:var(--ink-900)">把兩版文件交給 Plimsoll</span></div>
+        <div class="typerow"><code>--t-xl 22/750</code><span style="font-size:22px;font-weight:750;color:var(--ink-900)">25</span><span class="muted">KPI 數值</span></div>
+        <div class="typerow"><code>--t-lg 18/650</code><span style="font-size:18px;font-weight:650;color:var(--ink-900)">冷卻水出口溫度上限收緊</span></div>
+        <div class="typerow"><code>--t-md 15/640</code><span style="font-size:15px;font-weight:640;color:var(--ink-800)">卡片標題 / 主要按鈕</span></div>
+        <div class="typerow"><code>--t-body 13.5/400</code><span style="font-size:13.5px">對話內文，取代現行全站 text-xs</span></div>
+        <div class="typerow"><code>--t-sm 12.5/400</code><span style="font-size:12.5px;color:var(--ink-600)">次要說明、清單副標</span></div>
+        <div class="typerow"><code>--t-caption 11.5/600</code><span style="font-size:11.5px;font-weight:600;color:var(--ink-400)">標籤、頁碼</span></div>
+        <div style="border:1px solid var(--line);border-radius:var(--r-lg);padding:15px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;background:var(--surface);margin-top:14px">
+          <button class="btn btn-primary">主要動作</button>
+          <button class="btn btn-ghost">次要動作</button>
+          <button class="btn btn-danger btn-sm">破壞性</button>
+          <button class="btn btn-primary" disabled>停用</button>
+          <button class="act-chip">建議動作</button>
+          <span class="pill high">High</span><span class="pill med">Medium</span><span class="pill low">Low</span>
+          <span class="pill neutral">修改</span><span class="pill ink">信心度 高</span>
+          <span class="tag">本機</span><span class="tag remote">遠端</span><span class="tag sync">未同步</span><span class="tag drive">Drive</span>
+          <span class="cite">D01 · 新 p.4</span>
+          <span class="delta-old">85 °C</span><span class="delta-new">80 °C</span>
+          <span class="kbd">J</span><span class="kbd">Enter</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑪ RWD 手機／平板 ═══════════════ -->
+<section class="screen" id="s11">
+  <div class="note"><b>設計重點｜</b>
+    三欄在窄螢幕會崩，所以斷點策略是<b>「欄位變成分頁」</b>：<code>&lt;768px</code> 手機版只留對話為主畫面，左欄（紀錄）與右欄（來源）改成<b>底部分頁 + 上拉面板</b>；流程節點從直式改為<b>頂部橫向精簡步驟條</b>。<code>768–1279px</code> 平板為兩欄，右欄以抽屜出現。覆核判定按鈕在手機上放大到 44px 觸控高度，鍵盤快捷鍵隱藏。
+  </div>
+  <div class="frame">
+    <div class="devices">
+
+      <!-- 手機 · 對話 -->
+      <div class="device phone">
+        <div class="dlab">手機 375px · 對話</div>
+        <div class="dbody">
+          <div class="mtop">
+            <button class="icon-btn" style="width:28px;height:28px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="var(--ink-900)" stroke-width="2"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+            <span class="mname">Plimsoll</span>
+            <button class="icon-btn" style="width:28px;height:28px;margin-left:auto"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+          </div>
+          <div class="mflow">
+            <div class="mfstep done"><span class="md">✓</span><span>載入</span></div>
+            <div class="mfstep done"><span class="md">✓</span><span>比對</span></div>
+            <div class="mfstep now"><span class="md">3</span><span>覆核 18/25</span></div>
+            <div class="mfstep alert"><span class="md">!</span><span>簽核</span></div>
+          </div>
+          <div class="mthread">
+            <div class="msg"><div class="msg-av bot" style="width:24px;height:24px;font-size:9px">P</div>
+              <div class="msg-body"><div class="bubble" style="padding:10px 12px">
+                共 <b>25 筆</b>差異，<b style="color:var(--high-700)">4 筆 High</b>。
+                <div class="rcard" style="margin-top:8px">
+                  <div class="diffrow" style="padding:10px 11px">
+                    <span class="st"></span>
+                    <div class="m">
+                      <div style="display:flex;gap:5px;flex-wrap:wrap"><span class="pill high">High</span><span class="mono" style="font-size:9.5px;color:var(--ink-400)">D01</span></div>
+                      <div class="tt" style="margin-top:3px;font-size:12.5px">冷卻水出口溫度上限收緊</div>
+                      <div class="deltas" style="margin-top:5px"><span class="delta-old">85 °C</span><span style="color:var(--ink-400)">→</span><span class="delta-new">80 °C</span></div>
+                      <div class="eq"><span class="srcline">舊 p.4 → 新 p.4</span></div>
+                    </div>
+                  </div>
+                  <div class="review-bar" style="padding:10px 11px">
+                    <div class="choices" style="gap:5px">
+                      <button class="choice ok" style="flex:1;justify-content:center;min-height:40px">✓ 確認</button>
+                      <button class="choice track" style="flex:1;justify-content:center;min-height:40px">◷ 追蹤</button>
+                      <button class="choice no" style="flex:1;justify-content:center;min-height:40px">✕ 不採納</button>
+                    </div>
+                  </div>
+                </div>
+              </div></div>
+            </div>
+          </div>
+          <div class="mcomposer">
+            <div class="mbox">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" stroke-width="2"><path d="M21.4 11.05 12.25 20.2a6 6 0 0 1-8.49-8.49l9.2-9.19a4 4 0 0 1 5.65 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              <input placeholder="輸入訊息…">
+              <button class="send-btn" style="width:28px;height:28px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+            </div>
+          </div>
+          <div class="mtabs">
+            <button aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>對話</button>
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>來源</button>
+            <button><span class="mbadge">2</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>流程</button>
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/></svg>紀錄</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 手機 · 來源上拉面板 -->
+      <div class="device phone">
+        <div class="dlab">手機 · 來源上拉面板</div>
+        <div class="dbody">
+          <div class="mtop">
+            <button class="icon-btn" style="width:28px;height:28px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="var(--ink-900)" stroke-width="2"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+            <span class="mname">Plimsoll</span>
+          </div>
+          <div class="mwrap">
+            <div class="mthread" style="filter:blur(1.5px);opacity:.4">
+              <div class="msg"><div class="msg-av bot" style="width:24px;height:24px;font-size:9px">P</div><div class="msg-body"><div class="bubble">比對完成，共 25 筆差異。</div></div></div>
+            </div>
+            <div class="sheet">
+              <div class="grip"></div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <b style="font-size:var(--t-body);color:var(--ink-900)">來源檔案</b>
+                <span class="tag drive">Drive</span>
+                <button class="icon-btn" style="width:24px;height:24px;margin-left:auto"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+              </div>
+              <div class="srcbtns">
+                <button class="srcbtn"><span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.9-1.3A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z"/></svg></span><span class="sm"><b>本機資料夾</b><span>選取整個資料夾</span></span></button>
+                <button class="srcbtn"><span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 8 14M8 17h12M4 17 12 3"/></svg></span><span class="sm"><b>Google 雲端硬碟</b><span>已連線</span></span></button>
+              </div>
+              <div class="fcard"><div class="row"><div class="fico">PDF</div><div style="flex:1;min-width:0"><div class="nm">Main_Engine_Cooling_v1.0.pdf</div><div class="mt"><span class="tag drive">Drive</span>6 頁 · v1.0</div></div></div></div>
+              <div class="fcard"><div class="row"><div class="fico new">PDF</div><div style="flex:1;min-width:0"><div class="nm">Main_Engine_Cooling_v1.1.pdf</div><div class="mt"><span class="tag drive">Drive</span>6 頁 · v1.1</div></div></div></div>
+              <button class="btn btn-primary btn-full" style="min-height:44px">開始版本差異比對</button>
+            </div>
+          </div>
+          <div class="mtabs">
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>對話</button>
+            <button aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>來源</button>
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>流程</button>
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/></svg>紀錄</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 平板 -->
+      <div class="device tablet">
+        <div class="dlab">平板 768–1279px · 兩欄（右欄改抽屜）</div>
+        <div class="dbody">
+          <div class="mtop">
+            <button class="icon-btn" style="width:28px;height:28px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" stroke="var(--ink-900)" stroke-width="2"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+            <span class="mname">Plimsoll</span>
+            <span class="docpair" style="margin-left:6px"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span></span>
+            <button class="icon-btn" style="width:28px;height:28px;margin-left:auto"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/></svg></button>
+            <button class="icon-btn" style="width:28px;height:28px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+          </div>
+          <div style="display:grid;grid-template-columns:46px minmax(0,1fr);flex:1;min-height:0">
+            <aside class="histrail" style="border-right:1px solid var(--line)">
+              <div class="hist-top" style="flex-direction:column;padding:9px 7px;gap:5px">
+                <button class="newbtn" style="width:31px;height:31px;flex:none;padding:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg></button>
+                <button class="mini-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+              </div>
+              <div style="flex:1"></div>
+              <div class="hist-foot" style="justify-content:center;padding:8px 0"><span class="avatar">王</span></div>
+            </aside>
+            <div class="thread-col">
+              <div class="mflow">
+                <div class="mfstep done"><span class="md">✓</span><span>載入來源</span></div>
+                <div class="mfstep done"><span class="md">✓</span><span>差異比對 25 筆</span></div>
+                <div class="mfstep now"><span class="md">3</span><span>逐項覆核 18/25</span></div>
+                <div class="mfstep alert"><span class="md">!</span><span>簽核匯出</span></div>
+              </div>
+              <div class="thread" style="padding:13px 13px 6px">
+                <div class="msg" style="max-width:100%"><div class="msg-av bot" style="width:24px;height:24px;font-size:9px">P</div>
+                  <div class="msg-body"><div class="bubble">
+                    平板寬度下差異卡仍維持雙欄原文對照，右欄「原文來源」改以抽屜開啟。
+                    <div class="rcard">
+                      <div class="diff-cols" style="gap:9px;padding:11px 12px">
+                        <div class="diff-col"><div class="cap"><span>舊版 v1.0</span><span class="srcline">p.4 ↗</span></div>
+                          <div class="excerpt" style="font-size:11.5px">出口溫度<del>建議</del>維持 <del>85 °C</del> 以下</div></div>
+                        <div class="diff-col"><div class="cap"><span>新版 v1.1</span><span class="srcline">p.4 ↗</span></div>
+                          <div class="excerpt new" style="font-size:11.5px">出口溫度<ins>必須</ins>維持 <ins>80 °C</ins> 以下</div></div>
+                      </div>
+                      <div class="review-bar" style="padding:10px 12px">
+                        <div class="choices"><button class="choice ok" style="min-height:40px">✓ 已確認</button><button class="choice track" style="min-height:40px">◷ 需追蹤</button><button class="choice no" style="min-height:40px">✕ 不採納</button></div>
+                      </div>
+                    </div>
+                  </div></div>
+                </div>
+              </div>
+              <div class="mcomposer"><div class="mbox"><input placeholder="輸入訊息…"><button class="send-btn" style="width:28px;height:28px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ⑫ 視覺差異 ═══════════════ -->
+<section class="screen" id="s12">
+  <div class="note"><b>設計重點｜</b>
+    <b>這是目前完全沒有的新功能。</b>後端 <code>backend/main.py:166</code> 雖有 <code>/api/vision-diff</code>，但前端零呼叫、專案也沒有 PDF 光柵化能力（只有 <code>pypdf</code>），而且沒 API key 時直接回寫死假資料。要做需補：<b>PyMuPDF 光柵化 → 像素級 diff 算出變更區塊座標 → LLM 只負責解釋那些區塊</b>。四種檢視模式：並排標框、疊加 onion-skin、滑桿 swipe、差異遮罩。高亮顏色沿用設定中的色盤。
+  </div>
+  <div class="frame">
+    <div class="topbar">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+        <div><div class="brand-name">Plimsoll</div><div class="brand-sub">船舶技術文件版本差異 Agent</div></div>
+      </div>
+      <span class="docpair"><span class="v">v1.0</span><span>→</span><span class="v">v1.1</span></span>
+      <div class="topbar-right"><button class="icon-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button></div>
+    </div>
+    <div class="shell lcol" style="height:640px">
+      <aside class="histrail">
+        <div class="hist-top">
+          <button class="newbtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg><span>新的比對</span></button>
+          <button class="mini-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <div style="flex:1"></div>
+        <div class="hist-foot"><span class="avatar">王</span><span>王○○</span></div>
+      </aside>
+
+      <div class="thread-col">
+        <div class="thread-head"><span class="tt">主機冷卻系統維修程序</span><span class="pill ink">視覺差異</span></div>
+        <div class="thread">
+          <div class="msg user"><div class="msg-av me">王</div><div class="msg-body"><div class="bubble">p.2 那張水路圖有改嗎？文字比對看不出來。</div><div class="msg-time">11:20</div></div></div>
+          <div class="msg" style="max-width:100%">
+            <div class="msg-av bot">P</div>
+            <div class="msg-body">
+              <div class="bubble">
+                p.2 是工程圖頁，文字層只有標號。我把兩版該頁光柵化後做像素比對，找到 <b>3 個變更區塊</b>：
+                <div class="rcard">
+                  <div class="rcard-head"><h4>視覺差異 · p.2 冷卻水路圖</h4><span class="sub">像素比對 + AI 解讀</span><span class="pill med" style="margin-left:auto">信心度 中</span></div>
+                  <div class="rcard-pad">
+                    <div class="vmodes">
+                      <button aria-pressed="true">並排標框</button>
+                      <button>疊加 Onion</button>
+                      <button>滑桿 Swipe</button>
+                      <button>差異遮罩</button>
+                    </div>
+                    <div class="vstage">
+                      <div class="vpane">
+                        <div class="vcap"><span>舊版 v1.0 · p.2</span><span class="srcline">開原圖 ↗</span></div>
+                        <div class="snap">
+                          <span class="sk h" style="left:10%;top:7%;width:52%"></span>
+                          <span class="sk t" style="left:10%;top:16%;width:74%"></span>
+                          <span class="sk t" style="left:10%;top:21%;width:66%"></span>
+                          <span class="sk" style="left:14%;top:34%;width:30%;height:22%;border-radius:4px"></span>
+                          <span class="sk" style="left:54%;top:34%;width:30%;height:22%;border-radius:4px"></span>
+                          <span class="sk t" style="left:14%;top:62%;width:70%"></span>
+                          <span class="sk t" style="left:14%;top:68%;width:44%"></span>
+                          <span class="box del" style="left:52%;top:31%;width:34%;height:28%"><span class="bl">已移除</span></span>
+                          <span class="box del" style="left:12%;top:74%;width:26%;height:9%"><span class="bl">10 bar</span></span>
+                        </div>
+                      </div>
+                      <div class="vpane">
+                        <div class="vcap"><span>新版 v1.1 · p.2</span><span class="srcline">開原圖 ↗</span></div>
+                        <div class="snap">
+                          <span class="sk h" style="left:10%;top:7%;width:52%"></span>
+                          <span class="sk t" style="left:10%;top:16%;width:74%"></span>
+                          <span class="sk t" style="left:10%;top:21%;width:66%"></span>
+                          <span class="sk" style="left:14%;top:34%;width:30%;height:22%;border-radius:4px"></span>
+                          <span class="sk" style="left:54%;top:34%;width:30%;height:28%;border-radius:4px"></span>
+                          <span class="sk t" style="left:14%;top:68%;width:70%"></span>
+                          <span class="box add" style="left:52%;top:31%;width:34%;height:34%"><span class="bl">新增迴流閥 V-102</span></span>
+                          <span class="box add" style="left:12%;top:74%;width:26%;height:9%"><span class="bl">8 bar</span></span>
+                          <span class="box add" style="left:60%;top:72%;width:28%;height:9%"><span class="bl">新增標註</span></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="vlist">
+                      <div class="vrow"><span class="vswatch add"></span><b style="color:var(--ink-900)">V-102 迴流閥</b><span class="muted">新增於出口段，右側管線分歧</span><span class="pill high" style="margin-left:auto">High</span></div>
+                      <div class="vrow"><span class="vswatch del"></span><b style="color:var(--ink-900)">流量標示 10 bar → 8 bar</b><span class="muted">左下角壓力標註數值下修</span><span class="pill high" style="margin-left:auto">High</span></div>
+                      <div class="vrow"><span class="vswatch add"></span><b style="color:var(--ink-900)">新增圖說註記</b><span class="muted">右下角新增一行標註文字</span><span class="pill low" style="margin-left:auto">Low</span></div>
+                    </div>
+                    <div class="alert warn" style="margin-top:10px">
+                      <span class="a-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></span>
+                      <div><b>視覺差異為輔助判讀，信心度標為「中」</b>變更區塊由像素比對產生（客觀），但區塊內容的解讀由 AI 視覺模型推測，<b>必須人工確認後才可採納</b>。排版位移、掃描歪斜也可能造成誤報。</div>
+                    </div>
+                  </div>
+                  <div class="review-bar">
+                    <span class="lab">人工覆核判定</span>
+                    <div class="choices">
+                      <button class="choice ok" aria-pressed="false">✓ 已確認</button>
+                      <button class="choice track" aria-pressed="false">◷ 需追蹤</button>
+                      <button class="choice no" aria-pressed="false">✕ 誤報</button>
+                      <div style="margin-left:auto;display:flex;align-items:center;gap:7px">
+                        <span class="muted" style="font-size:10px">改判風險</span>
+                        <select class="input" style="width:auto;padding:5px 8px;font-size:11.5px"><option>High（AI 初判）</option><option>Medium</option><option>Low</option></select>
+                      </div>
+                    </div>
+                    <input class="input" style="margin-top:8px" placeholder="覆核理由 / 審核筆記">
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="act-chip">把 V-102 加入設備影響清單</button>
+                  <button class="act-chip plain">掃描其他圖頁</button>
+                </div>
+              </div>
+              <div class="msg-time">11:20 · 光柵化 300 dpi · 像素比對 0.4 秒 + AI 解讀 2.1 秒</div>
+            </div>
+          </div>
+        </div>
+        <div class="composer"><div class="composer-box"><textarea placeholder="輸入訊息…"></textarea>
+          <div class="composer-tools"><span class="pill ink" style="font-size:10px">已引用 p.2 視覺差異</span><button class="send-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div></div></div>
+      </div>
+
+      <aside class="siderail">
+        <div class="side-tabs"><button class="tab" aria-pressed="false">來源</button><button class="tab" aria-pressed="true">原文</button></div>
+        <div class="side-body">
+          <div class="pdf-switch"><button>文字重建</button><button>原始 PDF</button><button aria-pressed="true">視覺差異</button></div>
+          <div class="swipe">
+            <div class="half" style="background:var(--surface-2)">
+              <span class="sk h" style="position:absolute;left:8%;top:12%;width:40%"></span>
+              <span class="sk t" style="position:absolute;left:8%;top:28%;width:60%"></span>
+              <span class="sk" style="position:absolute;left:10%;top:44%;width:26%;height:30%;border-radius:4px"></span>
+            </div>
+            <div class="half new" style="background:var(--surface)">
+              <span class="sk h" style="position:absolute;left:8%;top:12%;width:40%"></span>
+              <span class="sk t" style="position:absolute;left:8%;top:28%;width:60%"></span>
+              <span class="sk" style="position:absolute;left:56%;top:44%;width:30%;height:36%;border-radius:4px"></span>
+              <span class="box add" style="left:54%;top:41%;width:34%;height:42%"><span class="bl">V-102</span></span>
+            </div>
+            <div class="handle"></div>
+          </div>
+          <p class="muted" style="font-size:10px;margin-top:7px;text-align:center">拖曳滑桿比對同一位置的新舊版</p>
+          <div class="todo" style="margin-top:11px">
+            <h5>圖頁掃描結果</h5>
+            <div class="check"><span class="b no">!</span><span><b style="color:var(--high-700)">p.2 水路圖</b> · 3 處變更</span></div>
+            <div class="check"><span class="b ok">✓</span><span>p.4 溫控曲線 · 無變更</span></div>
+            <div class="check"><span class="b wait">◷</span><span>p.5 掃描頁 · 歪斜校正中</span></div>
+          </div>
+        </div>
+        <div class="flowwrap">
+          <div class="fh"><span>流程狀態</span><span class="tag remote">遠端</span></div>
+          <div class="flow">
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>載入來源</b><span>v1.0 → v1.1</span></span></div>
+            <div class="fnode done"><span class="fdot">✓</span><span class="fmeta"><b>差異比對</b><span>25 筆文字 + 3 處視覺</span></span></div>
+            <div class="fnode now"><span class="fdot">3</span><span class="fmeta"><b>逐項覆核</b><span>18 / 28 已判定</span>
+              <span class="fbar"><i style="width:64%;background:var(--low-500)"></i><i style="width:11%;background:var(--high-500)"></i></span></span></div>
+            <div class="fnode"><span class="fdot">4</span><span class="fmeta"><b>簽核匯出</b><span>覆核後開放</span></span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+</div>
+<script>
+const tt=document.getElementById('themeToggle');
+tt.addEventListener('click',e=>{const b=e.target.closest('button[data-theme-set]');if(!b)return;
+  tt.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  document.documentElement.setAttribute('data-theme',b.dataset.themeSet);});
+const nt=document.getElementById('notesToggle');
+nt.addEventListener('click',e=>{const b=e.target.closest('button[data-notes]');if(!b)return;
+  nt.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  document.body.classList.toggle('hide-notes',b.dataset.notes==='off');});
+const picker=document.querySelector('.screen-picker');
+picker.addEventListener('click',e=>{const b=e.target.closest('button[data-go]');if(!b)return;
+  picker.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('is-on',s.id===b.dataset.go));
+  window.scrollTo({top:0,behavior:'smooth'});});
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.choice, .pdf-switch button, .seg button, .side-tabs button.tab, .pop-nav button, .bswatch, .rolecard, .fontopt, .sizeopt, .cdot, .preset button, .vmodes button, .mtabs button');
+  if(!c)return;
+  const grp=c.parentElement;
+  grp.querySelectorAll('[aria-pressed]').forEach(x=>x.setAttribute('aria-pressed',String(x===c)));});
+document.addEventListener('click',e=>{
+  const d=e.target.closest('.hist-item');if(!d||d.classList.contains('dragging'))return;
+  d.parentElement.querySelectorAll('.hist-item').forEach(x=>x.removeAttribute('aria-current'));
+  d.setAttribute('aria-current','true');});
+</script>
+</body>
+</html>
