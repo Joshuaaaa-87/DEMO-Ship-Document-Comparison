@@ -42,11 +42,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend" / "dist"
-if FRONTEND_DIST.exists():
-    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
-
 ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_DIST = ROOT / "frontend" / "dist"
 DEMO_OLD = ROOT / "data" / "demo" / "Main_Engine_Cooling_v1.0.pdf"
 DEMO_NEW = ROOT / "data" / "demo" / "Main_Engine_Cooling_v1.1.pdf"
 
@@ -75,17 +72,13 @@ class VisionDiffRequest(BaseModel):
     provider: str = "AWS Bedrock (Claude 3.5 Sonnet)"
 
 
-@app.get("/")
-def read_root():
-    index_file = FRONTEND_DIST / "index.html"
-    if index_file.exists():
-        return FileResponse(index_file)
-    return {"message": "Ship Doc Agent API Backend running. Frontend dist missing."}
-
-
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "service": "Ship Doc Agent FastAPI Backend with AI Orchestrator"}
+    return {
+        "status": "ok",
+        "service": "Ship Doc Agent FastAPI Backend with AI Orchestrator",
+        "frontend_dist_exists": FRONTEND_DIST.exists(),
+    }
 
 
 @app.get("/api/demo-data")
@@ -150,7 +143,6 @@ async def compare_files(
 def generate_slides_mindmap(payload: SlidesMindmapRequest):
     result = generate_mindmap_and_slides_with_llm(payload.differences, provider=payload.provider)
     if not result:
-        # Fallback structured synthetic slides and mindmap
         return {
             "presentation_slides": [
                 {"slide": 1, "title": "AI 船舶技術文件差異 Agent - Demo Day 簡報", "bullets": ["S1000D 100% 精準頁碼對照", "工安數值高紅自動警示"]},
@@ -219,3 +211,15 @@ def export_docx(payload: ExportDocxRequest):
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": "attachment; filename=ship-doc-diff-report.docx"},
     )
+
+
+# Mount Static Frontend SPA at Root (Defined AFTER all /api routes)
+if FRONTEND_DIST.exists():
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
+else:
+    @app.get("/")
+    def fallback_root():
+        return {
+            "message": "Ship Doc Agent API Backend running. Frontend dist missing.",
+            "hint": "Please run 'cd frontend && npm install && npm run build' first to generate frontend/dist.",
+        }
