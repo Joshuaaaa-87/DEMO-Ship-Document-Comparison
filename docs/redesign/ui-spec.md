@@ -201,6 +201,19 @@ TopBar 只留品牌、文件對、雙欄收合鈕與齒輪。**角色、主題�
 - Google 雲端硬碟：顯示已連線帳號與資料夾，可中斷授權
 - 明示唯讀權限範圍
 
+**資料庫同步（新增，見 §9 #24；沿用 ③ AI 模型的綠／灰燈狀態列樣式，不新增視覺語彙）**
+
+| 元件 | 規格 |
+|---|---|
+| 連線狀態列 | 綠「已連線 · PostgreSQL@host（或 SQLite 檔）」／灰「未連線 · 資料僅存本機」／琥珀「連線中…」／紅「連線失敗（原因）」。**啟動預設灰**，背景探測完成才轉燈 |
+| 待同步計數 | 「本機 N 筆待同步」；N=0 顯示「已全部同步」 |
+| 手動同步鈕 | 「立即同步到資料庫」；未連線 disabled；同步中顯示進度與可取消 |
+| 完整性告警 | flush 偵測某 session 完整性驗證失敗時，紅字列「M 筆因完整性待查已略過」，點擊展開導向人工處置（不自動刪改） |
+| 連線設定 | 連線字串／檔案路徑 + 「測試連線」；Key／密碼型欄位只存瀏覽器工作階段（比照 ③ API Key 規範，不寫入原始碼或版控） |
+
+- **全域小狀態點**：TopBar 齒輪或儲存位置 tag 旁一顆狀態點（綠／灰／琥珀／紅），hover 顯示「資料庫：已連線／未連線」。P0–P4 主流程仍以單一「本機」呈現（§9 #19），此點只反映有無接上 DB。
+- **啟動與降級**：首屏永遠可用（本機模式），不等待 DB；探測失敗只轉燈並允許重試，不彈錯誤中斷操作。
+
 **⑤ 更多視圖**
 - 多版本演進矩陣、簡報與心智圖、與 NotebookLM 的差異（皆接真實資料，見 §5 B9）
 
@@ -460,3 +473,9 @@ PDF 頁 ──光柵化(PyMuPDF, 300dpi)──> PNG
 | 16 | **高亮顏色可設定**：四組預設含色盲友善與單色，風險色跟著同一組色盤 |
 | 17 | **視覺差異比對**：新功能，像素 diff 定位 + LLM 解讀（現行版等於不存在） |
 | 18 | **分支**：程式碼在 `codex/260815`，commit 落在該分支，不碰 `main` |
+| 19 | **P0–P4 儲存範圍（local-first，DB 可選上游）**：**無 DB 亦可完整運作**，稽核軌跡寫本機 append-only JSONL 為真相來源；設定 DB 且可達時以 `event_id` idempotent 灌入（DB 為下游鏡像，非第二真相來源），未連線／失敗則保留本機並標 `未同步`。Excel／CSV 為匯出視圖；Google Sheet／雲端屬上游、受 §5 資料來源限制 v1 不建僅留介面。`localStorage` 只存 UI 偏好。詳見 [`architecture-decisions-A-B.md`](./architecture-decisions-A-B.md) |
+| 20 | **核准角色與可調分級規則**：覆核人拆 `reviewer_name`＋結構化 `approval_role_code`（以 `config/approval_roles.json` 承載，可增列、非寫死 enum，種子 DPA／TECH_SUPT／FLEET_MGR／OTHER）；分級門檻為版本化 `config/rulesets/v{N}.json`，調門檻＝新增版本檔、比對凍結 `ruleset_version`；核准權限為 `config/approval_policies`。**取代寫死的 `_risk_and_reason()`** |
+| 21 | **稽核軌跡 append-only，且兼任同步協定**：覆核狀態為事件流之投影、非可變欄位，改判＝追加凌駕行；防竄改採「凍結前綴 SHA-256 錨點」存於別處（DB 優先／離線退本機 `.integrity/`），灌 DB 前比對，不一致即**告警並略過**該 session（隔離、不刪改、待人工）。骨幹必落 **P0** |
+| 22 | **雙頁碼與 `data_origin` 為一級資料欄位**：頁碼＝`{pdf_page, print_label, label_source}`，印刷頁碼取自 PDF PageLabels，抓不到則 `NULL` 且不猜測；所有 API 回傳帶 `data_origin ∈ {computed, ai_inferred, demo_seed}`，真實 session 禁未標記寫死值（呼應假資料三態鐵則） |
+| 23 | **SyncTarget 契約（可插拔上游）**：LocalStore 為 commit 點、DB 為 best-effort／延後 flush 之下游；三態 tag（`本機`／`未同步`／`已同步`）由 `sync_state.json` 推導；參考 adapter 採 SQLAlchemy Core，同一份程式以連線字串接 SQLite 檔／Postgres／MySQL，不綁定 DB 品牌 |
+| 24 | **DB 不影響啟動＋UI 明示連線狀態**：啟動路徑只讀本機、零 DB 呼叫；DB 連線一律延遲背景探測、失敗降級本機、永不阻塞或崩潰。設定 → 資料來源新增「資料庫同步」狀態區並保留全域小狀態點（見 §3.4 ④） |
