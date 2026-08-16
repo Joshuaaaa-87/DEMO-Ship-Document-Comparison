@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plimsoll — 系統圖文手冊</title>
+<style>
+:root{
+  --ink-900:#000000; --ink-800:#171717; --ink-700:#333333; --ink-600:#575757;
+  --ink-500:#818181; --ink-400:#A5A5A5; --ink-300:#C9C9C9;
+  --line:#E3E3E3; --line-soft:#EDEDED;
+  --surface:#FFFFFF; --surface-2:#FAFAFA; --canvas:#F5F5F5;
+  --accent:#171717; --on-accent:#FFFFFF; --accent-soft:#F1F1F1; --accent-line:#E3E3E3;
+  --high-700:#B3241B; --high-500:#CE3A31; --high-200:#F0CDCA; --high-50:#FBF2F1;
+  --med-700:#8E540C;  --med-500:#C07C1A;  --med-200:#EADCBE;  --med-50:#FAF6EE;
+  --low-700:#14603F;  --low-500:#248A5F;  --low-200:#C7E2D5;  --low-50:#F1F7F3;
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-full:999px;
+  --sh-1:0 1px 2px rgba(0,0,0,.05); --sh-2:0 2px 12px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:"Inter","Noto Sans TC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang TC","Microsoft JhengHei",sans-serif;
+  background:var(--canvas);color:var(--ink-700);line-height:1.7;font-size:14px}
+.mono,code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.92em}
+
+/* ── layout ── */
+.shell{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+.nav{background:var(--surface);border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.nav-brand{display:flex;align-items:center;gap:9px;padding:0 6px 16px;border-bottom:1px solid var(--line-soft);margin-bottom:14px}
+.nav-brand svg{color:var(--ink-900);flex:none}
+.nav-brand b{font-size:16px;color:var(--ink-900);letter-spacing:-.02em;display:block}
+.nav-brand span{font-size:10.5px;color:var(--ink-500)}
+.nav a{display:flex;gap:9px;align-items:baseline;padding:7px 8px;border-radius:var(--r-sm);color:var(--ink-600);
+  font-size:12.5px;text-decoration:none;font-weight:600}
+.nav a:hover{background:var(--surface-2);color:var(--ink-900)}
+.nav a.on{background:var(--accent);color:var(--on-accent)}
+.nav a .n{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--ink-400);flex:none;width:18px}
+.nav a.on .n{color:var(--ink-400)}
+.nav .grp{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-400);
+  padding:16px 8px 6px}
+
+main{padding:40px 48px 100px;max-width:980px}
+header.top{margin-bottom:44px}
+header.top h1{font-size:30px;color:var(--ink-900);letter-spacing:-.03em;margin-bottom:8px}
+header.top p{color:var(--ink-500);font-size:14px;max-width:640px}
+.scope-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:var(--r-full);
+  font-size:11.5px;font-weight:650;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--ink-800)}
+.badge.high{background:var(--high-50);color:var(--high-700);border-color:var(--high-200)}
+.badge.low{background:var(--low-50);color:var(--low-700);border-color:var(--low-200)}
+
+section.sec{padding:56px 0;border-bottom:1px solid var(--line-soft)}
+section.sec:last-child{border-bottom:none}
+.sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.sec-num{font-family:ui-monospace,monospace;font-size:13px;color:var(--ink-400);font-weight:700}
+.sec-head h2{font-size:21px;color:var(--ink-900);letter-spacing:-.02em}
+.sec-sub{color:var(--ink-500);font-size:13px;margin:6px 0 22px;max-width:680px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1);
+  padding:20px 22px;margin-bottom:18px;overflow:auto}
+.mermaid{display:flex;justify-content:center}
+.readnote{display:flex;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--ink-900);
+  border-radius:var(--r-md);padding:11px 14px;font-size:12.5px;color:var(--ink-600);margin-top:2px}
+.readnote b{color:var(--ink-900)}
+
+/* scenario cards */
+.scenario{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1);
+  padding:22px 24px;margin-bottom:18px}
+.scenario-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.scenario-tag{font-family:ui-monospace,monospace;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:var(--r-sm);
+  background:var(--ink-900);color:#fff;letter-spacing:.04em}
+.scenario h3{font-size:16px;color:var(--ink-900)}
+.scenario .who{font-size:12px;color:var(--ink-500);margin:4px 0 14px}
+.steps{list-style:none;counter-reset:step}
+.steps li{counter-increment:step;position:relative;padding:8px 0 8px 30px;font-size:13px;color:var(--ink-700);
+  border-top:1px solid var(--line-soft)}
+.steps li:first-child{border-top:none}
+.steps li::before{content:counter(step);position:absolute;left:0;top:8px;width:20px;height:20px;border-radius:50%;
+  background:var(--accent-soft);color:var(--ink-800);font-size:10.5px;font-weight:800;display:grid;place-items:center}
+.steps li b{color:var(--ink-900)}
+.steps li .ac{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;color:var(--low-700);
+  background:var(--low-50);border:1px solid var(--low-200);border-radius:var(--r-sm);padding:1px 6px}
+.outcome{margin-top:14px;padding:11px 13px;background:var(--low-50);border:1px solid var(--low-200);border-radius:var(--r-md);
+  font-size:12.5px;color:var(--low-700)}
+.outcome.risk{background:var(--high-50);border-color:var(--high-200);color:var(--high-700)}
+
+/* glossary */
+table.gloss{width:100%;border-collapse:collapse;font-size:13px}
+table.gloss th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-400);
+  padding:8px 10px;border-bottom:1px solid var(--line)}
+table.gloss td{padding:10px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+table.gloss td.term{font-weight:700;color:var(--ink-900);white-space:nowrap}
+table.gloss td.code{font-family:ui-monospace,monospace;font-size:12px;color:var(--ink-600)}
+
+.footnote{margin-top:40px;padding:16px 18px;background:var(--surface);border:1px dashed var(--ink-300);border-radius:var(--r-md);
+  font-size:12px;color:var(--ink-500)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .nav{position:relative;height:auto;border-right:none;border-bottom:1px solid var(--line)}
+  main{padding:28px 18px 80px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav" id="nav">
+    <div class="nav-brand">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="16" cy="16" r="10"/><path d="M4 16h24M12 11h8M12 21h8" stroke-linecap="round"/></svg>
+      <div><b>Plimsoll</b><span>系統圖文手冊</span></div>
+    </div>
+    <div class="grp">總覽</div>
+    <a href="#overview"><span class="n">00</span>系統概觀與範圍</a>
+    <div class="grp">C4 模型</div>
+    <a href="#c4-context"><span class="n">01</span>情境圖 Context</a>
+    <a href="#c4-container"><span class="n">02</span>容器圖 Container</a>
+    <div class="grp">結構與流程</div>
+    <a href="#arch"><span class="n">03</span>架構圖・儲存層</a>
+    <a href="#flow"><span class="n">04</span>流程圖</a>
+    <a href="#sequence"><span class="n">05</span>時序圖</a>
+    <a href="#activity"><span class="n">06</span>活動圖</a>
+    <div class="grp">資料模型</div>
+    <a href="#er"><span class="n">07</span>ER Model</a>
+    <a href="#state"><span class="n">08</span>狀態圖（三張）</a>
+    <div class="grp">情境模擬</div>
+    <a href="#scenarios"><span class="n">09</span>使用者情境模擬</a>
+    <div class="grp">參考</div>
+    <a href="#glossary"><span class="n">10</span>詞彙對照表</a>
+  </nav>
+
+  <main>
+    <header class="top" id="overview">
+      <h1>Plimsoll — 系統圖文手冊</h1>
+      <p>船舶技術文件版本差異 Agent。核心承諾：確保執行者拿到正確、現行、完整的技術資料，並讓每一筆風險判定都可回溯到原文與覆核人。本手冊以圖表對照本輪確認的設計稿（ui-mockup-v3.2.html）與架構決策（architecture-decisions-A-B.md），供工程開發與跨角色溝通使用。</p>
+      <div class="scope-badges">
+        <span class="badge">範圍：P0–P4</span>
+        <span class="badge">儲存：local-first，DB 為可選上游</span>
+        <span class="badge low">稽核：append-only 事件日誌</span>
+        <span class="badge high">最高風險：核心痛點急迫性未經產業驗證（OQ3）</span>
+      </div>
+    </header>
+
+    <!-- 01 C4 CONTEXT -->
+    <section class="sec" id="c4-context">
+      <div class="sec-head"><span class="sec-num">01</span><h2>C4 模型・情境圖（System Context）</h2></div>
+      <p class="sec-sub">Plimsoll 在誰的世界裡運作：使用者是誰、系統邊界在哪、外部依賴有哪些。LLM 與 OCR 皆為可切換／可停用的外部依賴，不是必要相依。</p>
+      <div class="card"><div class="mermaid">
+C4Context
+title Plimsoll 系統情境圖
+Person(reviewer, "安全品質主管 / 維修工程師", "覆核差異並簽核匯出報告")
+System(plimsoll, "Plimsoll", "比對船舶技術文件版本差異，產生可稽核的覆核與簽核報告")
+SystemDb_Ext(localfs, "本機資料夾", "PDF 原始文件、JSONL 稽核日誌、設定檔（真相來源）")
+SystemDb_Ext(db, "資料庫（選用）", "PostgreSQL / MySQL / SQLite，下游鏡像，非必要")
+System_Ext(llm, "LLM 服務", "AWS Bedrock / GCP Vertex，僅語意解讀，不設定最終風險級")
+System_Ext(ocr, "OCR 服務", "本機 OSS 優先，雲端服務為殘差備援")
+Rel(reviewer, plimsoll, "上傳文件、覆核差異、簽核匯出")
+Rel(plimsoll, localfs, "一律先寫，真相來源")
+Rel(plimsoll, db, "選用同步，best-effort，事件冪等灌入")
+Rel(plimsoll, llm, "差異語意解讀，可切換/可停用")
+Rel(plimsoll, ocr, "掃描頁與工程圖頁文字擷取")
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>虛線外的三個外部系統都是「可選」或「可切換」：拔掉資料庫，系統仍完整運作；拔掉 LLM，退回本機規則引擎；拔掉雲端 OCR，退回本機 OSS 辨識。這是「輕量可轉向」原則在圖上的具體樣子。</div>
+    </section>
+
+    <!-- 02 C4 CONTAINER -->
+    <section class="sec" id="c4-container">
+      <div class="sec-head"><span class="sec-num">02</span><h2>C4 模型・容器圖（Container）</h2></div>
+      <p class="sec-sub">拆到「前端／後端／儲存／可插拔上游」四個容器，對應目前規劃的技術選型。</p>
+      <div class="card"><div class="mermaid">
+C4Container
+title Plimsoll 容器圖
+Person(reviewer, "覆核人員")
+Container_Boundary(app, "Plimsoll 應用") {
+  Container(spa, "前端 SPA", "React + Tailwind", "三欄對話式介面：來源、對話主線、覆核與匯出")
+  Container(api, "後端 API", "FastAPI (Python)", "文件解析、差異比對、規則引擎、StorageGateway")
+  ContainerDb(local, "LocalStore", "JSONL / JSON 檔案", "review_events.jsonl 等，append-only 真相來源")
+  Container(sync, "SyncTarget Adapter", "SQLAlchemy Core", "可插拔上游：SQLite / Postgres / MySQL")
+}
+ContainerDb_Ext(db, "資料庫（選用）", "PostgreSQL 等", "下游鏡像，非第二真相來源")
+Container_Ext(llmp, "LlmProvider", "Bedrock / Vertex / 本機規則", "Strategy 介面，可切換分析模式 A/B/C")
+Container_Ext(ocrp, "OCR Provider", "Tesseract/PaddleOCR + 雲端備援", "分層 OCR 管線")
+Rel(reviewer, spa, "操作", "HTTPS")
+Rel(spa, api, "呼叫", "REST/JSON")
+Rel(api, local, "先寫即 commit", "檔案 I/O")
+Rel(api, sync, "best-effort 寫穿 / flush_pending", "SQLAlchemy")
+Rel(sync, db, "idempotent upsert by event_id", "SQL")
+Rel(api, llmp, "差異語意解讀", "SDK/API")
+Rel(api, ocrp, "掃描頁/圖頁擷取", "SDK/API")
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>注意 <code>SyncTarget Adapter</code> 夾在後端與資料庫之間——換任何一種資料庫品牌，只是換這一個 adapter，前端與核心後端邏輯完全不動，這就是 §7「輕量可轉向」在架構上的體現。</div>
+    </section>
+
+    <!-- 03 ARCHITECTURE -->
+    <section class="sec" id="arch">
+      <div class="sec-head"><span class="sec-num">03</span><h2>架構圖・儲存層（Two-Layer + Gateway）</h2></div>
+      <p class="sec-sub">稽核軌跡「一律先寫本機、DB 為 best-effort 下游」的具體資料流，對應 architecture-decisions-A-B.md §19–23。</p>
+      <div class="card"><div class="mermaid">
+flowchart TB
+  subgraph APP["應用層 · FastAPI"]
+    GW["StorageGateway<br/>append_event / flush_pending"]
+  end
+  subgraph L1["Layer 1 · LocalStore（真相來源，永遠在，離線可用）"]
+    JSONL["review_events.jsonl<br/>append-only ★"]
+    SESS["session.json / differences.json"]
+    CFG["config/*.json（角色/門檻/政策）"]
+    SIDE["sync_state.json（可變 sidecar）"]
+  end
+  subgraph L2["Layer 2 · SyncTarget（可選、可插拔、下游鏡像）"]
+    ADAPT["SyncTarget 介面"]
+    PG[("PostgreSQL / MySQL / SQLite")]
+  end
+  GW -->|"① 一律先寫＝commit"| JSONL
+  GW --> SESS
+  GW --> CFG
+  GW -->|"② best-effort 寫穿"| ADAPT
+  ADAPT --> PG
+  GW -.->|"更新同步進度（不動稽核日誌）"| SIDE
+  JSONL -.->|"flush_pending：讀出尚未同步事件"| ADAPT
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>粗箭頭①是唯一「已提交」的寫入；②的虛／實線代表 best-effort——DB 寫失敗完全不影響①已經成功。沒有畫出的東西同樣重要：<b>沒有反向箭頭</b>從 DB 讀回本機，因為 DB 永遠不是第二真相來源。</div>
+    </section>
+
+    <!-- 04 FLOWCHART -->
+    <section class="sec" id="flow">
+      <div class="sec-head"><span class="sec-num">04</span><h2>流程圖・使用者主線（P0–P4）</h2></div>
+      <p class="sec-sub">從上傳到匯出的完整使用者路徑，標註對應的驗收情境（AC1–AC4）。</p>
+      <div class="card"><div class="mermaid">
+flowchart TD
+  A["選擇本機資料夾／拖放兩份 PDF"] --> B{"版本號／頁碼<br/>是否齊全？"}
+  B -- 否 --> C["Agent 於對話提出<br/>右欄就地補填 AC4"]
+  C --> B
+  B -- 是 --> D["啟動比對：<br/>頁雜湊短路 + 結構對齊"]
+  D --> E["確定性規則分類<br/>數值/義務/安全詞/引用"]
+  E --> F{"規則能判定？"}
+  F -- 否，語意不明 --> G["LLM 語意解讀<br/>可切換/可停用"]
+  F -- 是 --> H["產生候選風險等級<br/>High/Medium/Low　AC3"]
+  G --> H
+  H --> I["逐項覆核 DiffCard<br/>已確認／需追蹤／不採納"]
+  I --> J{"仍有 High<br/>未覆核？"}
+  J -- 是 --> K["匯出時彈出<br/>UnreviewedExportGuard"]
+  K --> L{"使用者選擇"}
+  L -- 先去覆核 --> I
+  L -- 勾選確認仍要匯出 --> M["匯出為修訂草稿<br/>並於封面加註警示"]
+  J -- 否 --> N["正常匯出<br/>DOCX / HTML / PDF"]
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>右側標註的 AC 是驗收情境對照（見 ui-spec.md §7）。整張圖只有一個「死結」：<code>K→L→先去覆核→I</code> 會一直迴圈，直到使用者主動勾選確認或把 High 全部覆核完，匯出攔截無法被繞過。</div>
+    </section>
+
+    <!-- 05 SEQUENCE -->
+    <section class="sec" id="sequence">
+      <div class="sec-head"><span class="sec-num">05</span><h2>時序圖・覆核與匯出攔截</h2></div>
+      <p class="sec-sub">一次覆核判定與一次匯出攔截的完整前後端互動，含稽核事件寫入與選用同步。</p>
+      <div class="card"><div class="mermaid">
+sequenceDiagram
+  actor U as 覆核人員
+  participant FE as 前端 SPA
+  participant API as 後端 API
+  participant GW as StorageGateway
+  participant LS as LocalStore(JSONL)
+  participant ST as SyncTarget(選用)
+
+  U->>FE: 點選 D01「已確認」
+  FE->>API: POST /reviews
+  API->>GW: append_event(HUMAN_REVIEW)
+  GW->>LS: 追加一行 JSONL（commit 點）
+  LS-->>GW: 寫入成功 fsync
+  GW-->>API: event_id = e-0002
+  opt 已設定 SyncTarget 且健康
+    GW->>ST: ingest_events best-effort
+    ST-->>GW: 成功則標記已同步／失敗則略過待下次 flush
+  end
+  API-->>FE: 200 OK 覆核已記錄
+
+  U->>FE: 點擊「匯出」
+  FE->>API: GET /export/precheck
+  API-->>FE: 尚有 2 筆 High 未覆核
+  FE-->>U: 彈出 UnreviewedExportGuard 逐項列出
+  alt 選擇先去覆核
+    U->>FE: 前往覆核
+  else 勾選已知悉並仍要匯出
+    U->>FE: 勾選確認
+    FE->>API: POST /export ack_override=true
+    API->>GW: append_event(EXPORTED_AS_DRAFT)
+    GW->>LS: 追加事件
+    API-->>FE: 回傳報告，標記修訂草稿
+  end
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b><code>opt</code> 區塊代表「有就做，沒有也不影響主線」——這就是選用同步的意思：拔掉 SyncTarget，整個時序圖上半部一樣成立。</div>
+    </section>
+
+    <!-- 06 ACTIVITY -->
+    <section class="sec" id="activity">
+      <div class="sec-head"><span class="sec-num">06</span><h2>活動圖・逐項覆核到匯出（含系統／人員泳道）</h2></div>
+      <p class="sec-sub">以系統與覆核人員兩條泳道呈現，強調哪些步驟是自動的、哪些必須人工決策。</p>
+      <div class="card"><div class="mermaid">
+flowchart TD
+  subgraph SWIM_SYS["系統"]
+    S1(["比對完成，產生候選風險"])
+    S2["寫入 AI_INITIAL 事件"]
+    S3{"匯出前檢查：<br/>仍有 High 未覆核？"}
+    S4["產生修訂草稿浮水印"]
+  end
+  subgraph SWIM_USER["覆核人員"]
+    U1["開啟 DiffCard 檢視雙欄原文"]
+    U2{"人工判定"}
+    U3["已確認"]
+    U4["需追蹤＋填寫理由"]
+    U5["不採納"]
+    U6["點擊匯出"]
+    U7{"是否知悉風險？"}
+    U8["回去覆核"]
+    U9["勾選確認並匯出"]
+  end
+  S1 --> S2 --> U1 --> U2
+  U2 -->|已確認| U3
+  U2 -->|需追蹤| U4
+  U2 -->|不採納| U5
+  U3 --> U6
+  U4 --> U6
+  U5 --> U6
+  U6 --> S3
+  S3 -->|是| U7
+  S3 -->|否| S4
+  U7 -->|回去覆核| U8 --> U1
+  U7 -->|知悉並繼續| U9 --> S4
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>系統泳道只做兩件事：產生候選、檢查是否放行。真正的風險判定（U2、U7）永遠落在人員泳道——這是「人工確認為最高權重」在圖上的具體表達，AI 不能單方面把流程推到 S4。</div>
+    </section>
+
+    <!-- 07 ER -->
+    <section class="sec" id="er">
+      <div class="sec-head"><span class="sec-num">07</span><h2>ER Model・資料模型</h2></div>
+      <p class="sec-sub">對應 architecture-decisions-A-B.md 的檔案化資料結構（無 DB 亦可完整運作）。</p>
+      <div class="card"><div class="mermaid">
+erDiagram
+  SESSION ||--o{ DIFFERENCE : contains
+  DIFFERENCE ||--o{ REVIEW_EVENT : "has audit trail"
+  REVIEW_EVENT }o--|| RULESET_VERSION : "judged under"
+  REVIEW_EVENT }o--o| APPROVAL_ROLE : "signed by"
+  APPROVAL_ROLE }o--|| APPROVAL_POLICY : "governed by"
+  SESSION ||--|| SYNC_STATE : "tracks sync of"
+  DIFFERENCE }o--o| COMPONENT_REF : "maps to (future, P28)"
+
+  SESSION {
+    string session_id PK
+    string old_doc_name
+    string new_doc_name
+    string old_version
+    string new_version
+    string data_origin
+  }
+  DIFFERENCE {
+    string difference_id PK
+    string session_id FK
+    string pdf_page_old
+    string pdf_page_new
+    string print_label_old
+    string print_label_new
+    string label_source
+    string category
+    string ai_risk_initial
+    string ai_confidence
+    string component_ref FK
+    string data_origin
+  }
+  REVIEW_EVENT {
+    string event_id PK
+    string session_id FK
+    string difference_id FK
+    string event_type
+    string human_verdict
+    string reviewer_name
+    string approval_role_code FK
+    string ruleset_version FK
+    string prev_event_id
+    string prev_hash
+    string hash
+    datetime created_at
+  }
+  APPROVAL_ROLE {
+    string role_code PK
+    string label_zh
+    string custom_role_label
+  }
+  APPROVAL_POLICY {
+    string ruleset_version PK
+    string role_code FK
+    string max_approvable_risk
+  }
+  RULESET_VERSION {
+    string ruleset_version PK
+    json thresholds
+    datetime created_at
+  }
+  SYNC_STATE {
+    string session_id PK
+    string target
+    string last_synced_event_id
+    datetime synced_at
+    int pending
+  }
+  COMPONENT_REF {
+    string ref PK
+    string label_zh
+    string system
+    string node2d
+    string node3d
+  }
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b><code>REVIEW_EVENT</code> 是整個模型的核心，它同時扮演「稽核紀錄」與「同步單位」兩個角色——這也是為什麼架構決策形容它「兼任同步協定」。<code>COMPONENT_REF</code> 目前標示為 future，對應 §28 的 2D 影響視圖，本輪不實作。</div>
+    </section>
+
+    <!-- 08 STATE -->
+    <section class="sec" id="state">
+      <div class="sec-head"><span class="sec-num">08</span><h2>狀態圖（共三張）</h2></div>
+      <p class="sec-sub">分別對應「一次比對工作階段怎麼推進」「一筆差異的覆核判定怎麼變化」「儲存要不要同步到資料庫」三個獨立但常被混在一起討論的狀態機。</p>
+
+      <h3 style="font-size:14.5px;color:var(--ink-900);margin-bottom:10px">08.1　Session 進度狀態機</h3>
+      <div class="card"><div class="mermaid">
+stateDiagram-v2
+  [*] --> 載入來源
+  載入來源 --> 待補件: 缺版本號或掃描頁信心不足
+  待補件 --> 載入來源: 人工補填後重新檢查
+  載入來源 --> 差異比對: 版本號與頁碼皆齊全
+  差異比對 --> 逐項覆核: 產生候選差異與風險等級
+  逐項覆核 --> 逐項覆核: 每筆判定為追加事件，互不影響
+  逐項覆核 --> 簽核匯出: 點擊匯出
+  簽核匯出 --> 修訂草稿匯出: 仍有 High 未覆核，且人工勾選確認
+  簽核匯出 --> 正式匯出: 全部 High 已覆核
+  修訂草稿匯出 --> [*]
+  正式匯出 --> [*]
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>這張對應右欄底部的四個流程節點（載入來源／差異比對／逐項覆核／簽核匯出）。唯一的分岔在最後一步：有沒有「修訂草稿」警示，取決於還有沒有 High 未覆核，而不是取決於使用者想不想匯出。</div>
+
+      <h3 style="font-size:14.5px;color:var(--ink-900);margin:26px 0 10px">08.2　差異覆核判定狀態機</h3>
+      <div class="card"><div class="mermaid">
+stateDiagram-v2
+  [*] --> AI_INITIAL: 比對完成，系統產生候選風險
+  AI_INITIAL --> CONFIRMED: 人工判定「已確認」
+  AI_INITIAL --> TRACKED: 人工判定「需追蹤」
+  AI_INITIAL --> REJECTED: 人工判定「不採納」
+  CONFIRMED --> TRACKED: 追加新事件改判
+  CONFIRMED --> REJECTED: 追加新事件改判
+  TRACKED --> CONFIRMED: 追加新事件改判
+  TRACKED --> REJECTED: 追加新事件改判
+  REJECTED --> CONFIRMED: 追加新事件改判
+  REJECTED --> TRACKED: 追加新事件改判
+  AI_INITIAL --> [*]: 若為 High，匯出時觸發 UnreviewedExportGuard
+  CONFIRMED --> [*]: 視為已覆核，可正常匯出
+  TRACKED --> [*]: 視為已覆核，可正常匯出
+  REJECTED --> [*]: 視為已覆核，可正常匯出
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>箭頭再多都只是「表面狀態」，底層永遠是<b>追加事件</b>，不是覆寫欄位——CONFIRMED 改判成 TRACKED，實際上是多寫一行 <code>review_events.jsonl</code>，舊的 CONFIRMED 事件仍然留著，供稽核回溯「誰在什麼時候把已確認改成需追蹤」。唯一會擋下匯出的狀態是 <code>AI_INITIAL</code>（人工完全還沒判定過）。</div>
+
+      <h3 style="font-size:14.5px;color:var(--ink-900);margin:26px 0 10px">08.3　儲存三態與完整性隔離</h3>
+      <div class="card"><div class="mermaid">
+stateDiagram-v2
+  [*] --> 本機: 未設定同步或從未同步
+  本機 --> 未同步: 設定同步後產生新事件
+  未同步 --> 已同步: flush_pending 成功送達
+  已同步 --> 未同步: 本機再產生新事件
+  未同步 --> 隔離: 完整性驗證失敗（前綴 hash 不符）
+  隔離 --> [*]: 人工處置（下載原始日誌／標記已知悉）
+      </div></div>
+      <div class="readnote"><b>怎麼讀｜</b>這張跟上面兩張的差異在於：它描述的是「資料庫同不同步」，不是「這筆差異對不對」——即使一筆差異的覆核狀態是 CONFIRMED，它所屬的 session 仍然可能是「未同步」。兩個狀態機互相獨立。「隔離」是唯一不會自動恢復的狀態，系統不做自動修復，永遠等待人工處置。</div>
+    </section>
+
+    <!-- 09 SCENARIOS -->
+    <section class="sec" id="scenarios">
+      <div class="sec-head"><span class="sec-num">09</span><h2>使用者情境模擬</h2></div>
+      <p class="sec-sub">五個具代表性的操作情境，涵蓋正常路徑、缺件補流程、匯出攔截、低信心判讀與完整性風險。</p>
+
+      <div class="scenario">
+        <div class="scenario-head"><span class="scenario-tag">情境 A</span><h3>正常路徑：從上傳到簽核匯出</h3></div>
+        <p class="who">陳○○・安全品質主管，登入身分＝安全品質主管；核准角色＝船舶技術監督</p>
+        <ul class="steps">
+          <li>選擇本機資料夾，一次帶入主機冷卻系統維修程序 v1.0 與 v1.1 兩份 PDF<span class="ac">AC1</span></li>
+          <li>系統顯示文件名稱／版本／日期／適用設備，皆齊全，直接進入比對</li>
+          <li>比對完成，產生 25 筆差異，其中 4 筆 High，Agent 於對話中列出重大變更摘要<span class="ac">AC3</span></li>
+          <li>陳○○逐項開啟 <b>DiffCard</b>，對照雙欄原文與雙頁碼，一一標記已確認／需追蹤<span class="ac">AC2</span></li>
+          <li>全部 High 覆核完成後點擊匯出，未跳出攔截，直接進入簽核表單</li>
+          <li>選擇核准角色「船舶技術監督」，填入審查日期與報告編號，下載 DOCX 審查報告</li>
+        </ul>
+        <div class="outcome">結果：報告不含任何未覆核警示，25 筆差異全部附雙版本、雙頁碼、原文，稽核軌跡完整寫入本機。</div>
+      </div>
+
+      <div class="scenario">
+        <div class="scenario-head"><span class="scenario-tag">情境 B</span><h3>缺件補流程：抓不到新版版本號</h3></div>
+        <p class="who">維修工程師，登入身分＝維修工程師</p>
+        <ul class="steps">
+          <li>從本機資料夾挑了兩份 PDF，其中新版檔名未含版本號</li>
+          <li>Agent 在對話中主動提出「新版文件缺少版本號碼」，不自行猜測<span class="ac">AC4</span></li>
+          <li>右欄來源卡出現「手動輸入新版版本號」必填欄位，比對按鈕維持 disabled</li>
+          <li>同時偵測到新版 p.5 為疑似掃描頁，文字層不足，一併於對話中提出</li>
+          <li>工程師補填版本號 v1.1 後，比對按鈕才轉為可點擊</li>
+        </ul>
+        <div class="outcome">結果：系統不接受推測版本，直到人工補齊關鍵資訊才放行比對，避免報告建立在不可靠的版本基礎上。</div>
+      </div>
+
+      <div class="scenario">
+        <div class="scenario-head"><span class="scenario-tag">情境 C</span><h3>搶先匯出被攔截：仍有 High 未覆核</h3></div>
+        <p class="who">陳○○・安全品質主管</p>
+        <ul class="steps">
+          <li>比對出 25 筆差異、4 筆 High，陳○○只覆核了 22 筆便直接點擊「匯出」</li>
+          <li>系統彈出 <b>UnreviewedExportGuard</b>，逐項列出剩餘 2 筆 High（D01、D07）及其風險內容<span class="ac">情境四</span></li>
+          <li>陳○○選擇「先去覆核這 2 項」，回到 DiffCard 完成判定</li>
+          <li>（替代路徑）若選擇仍要匯出，必須先勾選「我已知悉此報告將標為修訂草稿」，確認按鈕才會從 disabled 轉為可點擊</li>
+          <li>匯出的報告封面自動加註「修訂草稿」警示與未覆核清單</li>
+        </ul>
+        <div class="outcome risk">結果：系統不會靜默放行未覆核的重大風險項，任何跳過覆核的匯出都會被明確標記，責任可追溯到簽核人。</div>
+      </div>
+
+      <div class="scenario">
+        <div class="scenario-head"><span class="scenario-tag">情境 D</span><h3>低信心判讀：工程圖頁的視覺差異（P8，示意）</h3></div>
+        <p class="who">陳○○・安全品質主管</p>
+        <ul class="steps">
+          <li>新版文件 p.2 為水路圖工程圖頁，像素比對定位出 3 處變更區塊</li>
+          <li>系統標示「視覺差異為輔助判讀，信心度標為中」，並說明變更區塊由像素比對產生（客觀），但內容解讀由 AI 視覺模型推測<span class="ac">AC4</span></li>
+          <li>陳○○對照左右滑桿比對同一位置的新舊版原圖，確認新增迴流閥 V-102</li>
+          <li>覆核判定「已確認」，並在覆核理由填寫「已同步更新每週保養排程表」</li>
+        </ul>
+        <div class="outcome">結果：AI 只負責定位「哪裡變了」，不對「變得好不好」下結論；最終判定必須人工完成。此情境對應 P8，本輪 P0–P4 暫不實作，僅供理解未來設計方向。</div>
+      </div>
+
+      <div class="scenario">
+        <div class="scenario-head"><span class="scenario-tag">情境 E</span><h3>完整性驗證失敗：稽核日誌疑遭手動修改</h3></div>
+        <p class="who">系統背景行為 + 覆核人員後續處置</p>
+        <ul class="steps">
+          <li>「壓載水處理系統手冊」比對紀錄嘗試 flush_pending 同步到資料庫</li>
+          <li>系統比對凍結前綴 SHA-256 錨點，發現與目前檔案內容不符</li>
+          <li>系統自動判定為 <b>隔離</b>：不灌入資料庫、不刪改本機檔案，於「設定 → 資料來源」顯示完整性告警</li>
+          <li>使用者可選擇「下載原始稽核日誌」交付人工比對，或「標記為已知悉並結案」（不影響本機原始檔案）</li>
+        </ul>
+        <div class="outcome risk">結果：系統對可能遭竄改的稽核紀錄採取「隔離不處理」而非「自動修復」，把處置權完全留給人工，避免竄改被系統自動掩蓋。</div>
+      </div>
+    </section>
+
+    <!-- 10 GLOSSARY -->
+    <section class="sec" id="glossary">
+      <div class="sec-head"><span class="sec-num">10</span><h2>詞彙對照表</h2></div>
+      <p class="sec-sub">跨角色溝通時容易混淆的名詞，統一在此對齊。</p>
+      <div class="card">
+        <table class="gloss">
+          <tr><th>詞彙</th><th>說明</th><th>對應欄位／檔案</th></tr>
+          <tr><td class="term">三態儲存 tag</td><td>本機／未同步／已同步，描述這筆稽核紀錄有沒有送達資料庫，由 <code>sync_state.json</code> 推導，非稽核資料本身</td><td class="code">sync_state.json</td></tr>
+          <tr><td class="term">Drive（來源連線類型）</td><td>回答「檔案從哪裡挑的」，與儲存三態是兩個獨立概念，可以同時成立（例如來源是 Drive、儲存狀態是本機）</td><td class="code">P7・尚未實作</td></tr>
+          <tr><td class="term">核准角色</td><td>簽核報告時選擇的權責角色（船舶技術監督／DPA／船隊經理／其他），與登入身分（安全品質主管／維修工程師）是兩個獨立概念</td><td class="code">approval_role_code</td></tr>
+          <tr><td class="term">ruleset_version</td><td>分級門檻的版本號；調整門檻＝新增新版本檔，不覆寫舊版本，確保舊報告的判定依據可回溯</td><td class="code">config/rulesets/v{N}.json</td></tr>
+          <tr><td class="term">data_origin</td><td>標記一筆資料是「計算得出」「AI 推論」還是「示範種子資料」，真實 session 禁止出現未標記的寫死值</td><td class="code">computed / ai_inferred / demo_seed</td></tr>
+          <tr><td class="term">append-only 事件日誌</td><td>覆核狀態不是可改欄位，而是事件流的投影；改判＝追加一筆新事件，永不覆寫舊事件</td><td class="code">review_events.jsonl</td></tr>
+          <tr><td class="term">隔離（Quarantine）</td><td>完整性驗證失敗時的狀態：不灌入資料庫、不刪改本機檔案，等待人工處置</td><td class="code">flush_pending()</td></tr>
+          <tr><td class="term">analysis_mode</td><td>A（規則優先，預設）／B（純模型）／C（模型為主）；切換即換整套判定邏輯，B/C 需釘版本以利複現</td><td class="code">config/app.json</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <div class="footnote">本手冊對照版本：ui-mockup-v3.2.html、architecture-decisions-A-B.md（§19–32）、已驗證需求摘要 v4。P5–P9 與 §28 2D 影響視圖等尚未實作項目，圖中已標明「Someday」或「示意」，不代表本輪交付範圍。</div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad:true,
+  theme:'base',
+  themeVariables:{
+    fontFamily:'Inter, "Noto Sans TC", sans-serif',
+    primaryColor:'#F1F1F1',
+    primaryTextColor:'#171717',
+    primaryBorderColor:'#C9C9C9',
+    lineColor:'#818181',
+    secondaryColor:'#FAFAFA',
+    tertiaryColor:'#FFFFFF',
+    noteBkgColor:'#FAF6EE',
+    noteBorderColor:'#EADCBE',
+    actorBkg:'#F1F1F1',
+    actorBorder:'#C9C9C9',
+    actorTextColor:'#171717',
+    signalColor:'#575757',
+    signalTextColor:'#333333',
+    labelBoxBkgColor:'#F1F1F1',
+    labelBoxBorderColor:'#C9C9C9',
+    labelTextColor:'#171717'
+  },
+  flowchart:{ curve:'basis', htmlLabels:true },
+  er:{ fontSize:12 },
+  sequence:{ actorFontSize:12, noteFontSize:11, messageFontSize:12 }
+});
+
+// scrollspy for nav
+const links = [...document.querySelectorAll('.nav a')];
+const secs = links.map(a => document.querySelector(a.getAttribute('href')));
+function onScroll(){
+  let idx = 0;
+  const y = window.scrollY + 120;
+  secs.forEach((s,i)=>{ if(s && s.offsetTop <= y) idx = i; });
+  links.forEach((a,i)=> a.classList.toggle('on', i===idx));
+}
+document.addEventListener('scroll', onScroll);
+onScroll();
+</script>
+</body>
+</html>
