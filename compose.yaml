@@ -1,0 +1,19 @@
+services:
+  plimsoll:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      PLIMSOLL_DATA_DIR: /data
+      PLIMSOLL_OCR_LANG: eng+chi_tra
+      PLIMSOLL_LLM_API_KEY: ${PLIMSOLL_LLM_API_KEY:-}
+      PLIMSOLL_LLM_MODEL: ${PLIMSOLL_LLM_MODEL:-}
+      PLIMSOLL_LLM_BASE_URL: ${PLIMSOLL_LLM_BASE_URL:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
+    volumes:
+      - plimsoll-data:/data
+    restart: unless-stopped
+
+volumes:
+  plimsoll-data:
